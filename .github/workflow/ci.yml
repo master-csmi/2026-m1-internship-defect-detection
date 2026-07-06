@@ -21,11 +21,17 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[notebook]"
 
+      - name: Download test data
+        run: python -c "from ecg_anomaly.data import download_mitbih; download_mitbih()"
+
+      - name: Run tests
+        run: pytest
 
       - name: Summary
         run: |
           echo "CI workflow completed successfully." >> $GITHUB_STEP_SUMMARY
           echo "Python version: 3.11" >> $GITHUB_STEP_SUMMARY
           echo "Dependencies installed successfully" >> $GITHUB_STEP_SUMMARY
-          
+          echo "MIT-BIH data: downloaded successfully" >> $GITHUB_STEP_SUMMARY
+          echo "Tests passed successfully" >> $GITHUB_STEP_SUMMARY
       
