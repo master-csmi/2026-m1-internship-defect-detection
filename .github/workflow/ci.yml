@@ -22,7 +22,7 @@ jobs:
         run: pip install -e ".[notebook]"
 
       - name: Download test data
-        run: python -c "from ecg_anomaly.data import download_mitbih; download_mitbih()"
+        run: python -c "from m1_defect_anomaly_2026.data import download_mitbih; download_mitbih()"
 
       - name: Run tests
         run: pytest
