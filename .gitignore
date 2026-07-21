@@ -16,6 +16,7 @@ dist/
 .ipynb_checkpoints/
 
 data/raw/*
+!data/raw/.gitkeep
 
 
 .DS_Store
@@ -23,3 +24,11 @@ Thumbs.db
 
 .vscode/
 .idea/
+
+docs/*.aux
+docs/*.log
+docs/*.out
+docs/*.pdf
+docs/*.toc
+
+.pytest_cache
