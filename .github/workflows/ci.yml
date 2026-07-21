@@ -21,8 +21,8 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[notebook]"
 
-      - name: Download test data
-        run: python -c "from m1_defect_anomaly_2026.data import download_mitbih; download_mitbih()"
+      - name: Download test data (record 100 only)
+        run: python -c "from m1_defect_anomaly_2026.data import download_mitbih; download_mitbih(records=['100'])"
 
       - name: Run tests
         run: pytest
@@ -32,6 +32,6 @@ jobs:
           echo "CI workflow completed successfully." >> $GITHUB_STEP_SUMMARY
           echo "Python version: 3.11" >> $GITHUB_STEP_SUMMARY
           echo "Dependencies installed successfully" >> $GITHUB_STEP_SUMMARY
-          echo "MIT-BIH data: downloaded successfully" >> $GITHUB_STEP_SUMMARY
+          echo "MIT-BIH data: record 100 downloaded successfully" >> $GITHUB_STEP_SUMMARY
           echo "Tests passed successfully" >> $GITHUB_STEP_SUMMARY
       

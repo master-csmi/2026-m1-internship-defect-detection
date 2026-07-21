@@ -4,9 +4,9 @@ import wfdb
 DEFAULT_DATA_DIR = "data/raw"
 
 # download the full MIT-BIH Arrhythmia Database
-def download_mitbih(dest_dir: str = DEFAULT_DATA_DIR) -> None:
+def download_mitbih(dest_dir: str = DEFAULT_DATA_DIR,records=None) -> None:
     os.makedirs(dest_dir, exist_ok=True)
-    wfdb.dl_database("mitdb", dl_dir = dest_dir)
+    wfdb.dl_database("mitdb", dl_dir = dest_dir, records= records)
     print(f"Downloaded MIT-BIH Arrhythmia Database to '{dest_dir}'")
 
 
