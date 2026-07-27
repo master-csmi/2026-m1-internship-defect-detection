@@ -46,3 +46,20 @@ def preprocess(signal, fs=FS, method="bandpass"):
 
 
 
+
+
+"""I verified while using the terminal : python -c "
+from m1_defect_anomaly_2026.preprocessing import bandpass
+import numpy as np
+fs = 360
+x = np.zeros(fs*4)
+x[fs*2] = 1.0
+y = bandpass(x, fs)
+peak = int(np.argmax(np.abs(y)))
+print('shift:', peak - fs*2)
+"
+shift: 0
+
+
+i got shift=0 that means our peak position are preserved
+"""
