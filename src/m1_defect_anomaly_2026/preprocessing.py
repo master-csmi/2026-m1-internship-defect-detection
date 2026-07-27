@@ -1,12 +1,12 @@
 import numpy as np
-from scipy.signal import butter, filtfilt, medlift
+from scipy.signal import butter, filtfilt, medfilt
 
 FS = 360 # sampling rate in Hz
 
 #keeps only 0.5 to 40 Hz (where the heartbeat lives)
 def bandpass(signal, fs=FS, low=0.5,high=10.0,order=3):
     half_fs = fs/2
-    b, a =butter(order,[low/half_fs, high/half_fs],dtype="band")
+    b, a =butter(order,[low/half_fs, high/half_fs],btype="band")
     return filtfilt(b,a,signal)
 
 
@@ -20,9 +20,9 @@ def remove_baseline_median(signal,fs=FS):
     w2+=1 if w2%2==0 else 0
 
     #we remove tall spikes
-    step1=medlift(signal, kernel_size=w1)
+    step1=medfilt(signal, kernel_size=w1)
     #remove wider waves
-    baseline=medlift(step1,kernel_size=w2)
+    baseline=medfilt(step1,kernel_size=w2)
     return signal -baseline
 
 # rescale our data
