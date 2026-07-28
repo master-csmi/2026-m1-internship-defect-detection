@@ -85,6 +85,18 @@ def load_split(record_names,data_dir="data/raw", preprocess_method="bandpass"):
     return [load_record_data(n,data_dir,preprocess_method) for n in record_names]
 
 
+# create a function that walks to each heartbeat looks at the window and take the loadest shout
+def aggregate_to_beats(sample_scores,r_peaks, pre=PRE,post=POST):
+    n=len(sample_scores)
+    out=np.empty(len(r_peaks),dtype=float)
+    for i,peak in enumerate(r_peaks):
+        low=max(0,peak-pre)
+        high=min(n,peak+post)
+        out[i]=sample_scores[low:high].max()
+    return out
+
+
+
 
 
 
