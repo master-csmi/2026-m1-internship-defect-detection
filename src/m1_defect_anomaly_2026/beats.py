@@ -27,3 +27,17 @@ class RecordData:
         return float(self.y.mean()) if self.n_beats else 0.0
 
 
+
+
+# return only the MLII lead
+def pick_lead(record):
+    if "MLII" in record.sig_name:
+        return record.sig_name.index("MLII")
+
+    return 0
+
+
+
+
+
+
