@@ -98,6 +98,10 @@ def aggregate_to_beats(sample_scores,r_peaks, pre=PRE,post=POST):
 
 
 
+# function that slices the long recording into individual heartbeats and puts them into a table
+def extract_beat_matrix(rec):
+    return np.stack([rec.signal[p-PRE:p+POST] for p in rec.r_peaks])
+
 
 
 
