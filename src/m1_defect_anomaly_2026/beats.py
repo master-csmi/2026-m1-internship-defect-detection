@@ -80,6 +80,14 @@ beats: 2953
 anomaly rate: 0.463
 """
 
+# function that helps load a whole list of records
+def load_split(record_names,data_dir="data/raw", preprocess_method="bandpass"):
+    return [load_record_data(n,data_dir,preprocess_method) for n in record_names]
+
+
+
+
+
 
 
 
