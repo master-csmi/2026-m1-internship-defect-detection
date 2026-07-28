@@ -1,6 +1,7 @@
 import numpy as np
 from .preprocessing import FS, preprocess
 from .splits import AAMI_MAP, BEAT_SYMBOLS
+import wfdb
 
 # window around R-peak
 
@@ -37,6 +38,47 @@ def pick_lead(record):
     return 0
 
 
+# read one record from the disk and return a record data object
+def load_record_data(name,data_dir="data/raw",preprocess_method="bandpass"):
+    path=f"{data_dir}/{name}"
+    record=wfdb.rdrecord(path) # to get the signal
+    ann=wfdb.rdann(path,"atr") # to get the labels
+
+    lead = pick_lead(record)
+    raw=record.p_signal[:,lead]
+    signal =preprocess(raw,fs=record.fs,method=preprocess_method)
+    
+
+    r_peaks,labels=[],[]
+    for sample,symbol in zip(ann.sample,ann.symbol):
+        if symbol not in BEAT_SYMBOLS: continue
+        if sample-PRE<0 or sample+POST>=record.sig_len: #drop edge beats
+            continue
+
+        r_peaks.append(sample)
+        labels.append(AAMI_MAP[symbol])
+
+
+    r_peaks = np.asarray(r_peaks,dtype=int)
+    labels=np.asarray(labels)
+    y=np.array([0 if label=="N" else 1 for label in labels])
+
+    return RecordData(name,signal,r_peaks,labels,y)
+
+"""ran this test and got the results:
+python -c "
+from m1_defect_anomaly_2026.beats import load_record_data
+rec = load_record_data('208')
+print('name:', rec.name)
+print('signal length:', rec.signal.shape)
+print('beats:', rec.n_beats)
+print('anomaly rate:', round(rec.anomaly_rate, 3))
+"
+name: 208
+signal length: (650000,)
+beats: 2953
+anomaly rate: 0.463
+"""
 
 
 
