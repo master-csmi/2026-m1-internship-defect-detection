@@ -18,3 +18,12 @@ def rolling_stats(signal,window):
 
 
 
+# score each sample by how far it sits from its average
+def zscore_detector(signal,window=360,eps=1e-6):
+    mean, std=rolling_stats(signal,window)
+    return np.abs(signal-mean)/(std+eps) # abs because a spike up or a dip down are both unusual
+
+
+
+
+
