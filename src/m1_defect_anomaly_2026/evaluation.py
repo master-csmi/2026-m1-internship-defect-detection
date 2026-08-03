@@ -32,3 +32,25 @@ def evaluate_scores(y_true, scores, threshold,method="unnamed"):
 
 
 
+
+
+
+# find a threshold with the best F1 while using the training set
+def select_threshold(y_true,scores,n_candidates=200):
+
+    candidates=np.percentile(scores,np.linspace(0.5,99.9,n_candidates))
+    candidates=np.unique(candidates)
+    best_threshold=candidates[0]
+    best_f1=-1.0
+
+    for threshold in candidates:
+        y_pred=(scores>=threshold).astype(int)
+        _,_,f1,_=precision_recall_fscore_support(y_true,y_pred,average="binary",zero_division=0)
+        if f1> best_f1:
+            best_f1=f1
+            best_threshold=threshold
+
+
+
+    return float(best_threshold), float(best_f1)
+
