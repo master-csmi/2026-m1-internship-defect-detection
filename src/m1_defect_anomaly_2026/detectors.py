@@ -26,4 +26,30 @@ def zscore_detector(signal,window=360,eps=1e-6):
 
 
 
+# CUSUM is a detector that detects gradual and sustained shifts in the signal
+# At each step we add how far the signal is from normal inus a small allowance k
+# window if is "normal" it is measuredon a rolling window instead the whole signal
+def cusum_detector(signal, threshold_k=0.5,window=None):
+    if window is None:
+        mean = signal.mean()
+        std=signal.std() +1e-12
+        z=(signal-mean)/std
+    else:
+        mean,std=rolling_stats(signal, window)
+        z=(signal-mean)/(std+1e-6)
+
+
+    n=len(z)
+    up_scores=np.zeros(n)
+    down_scores=np.zeros(n)
+    up=0.0
+    down=0.0
+    for i in range(n):
+        up=max(0.0,up+z[i]-threshold_k)
+        down=max(0.0,down-z[i]-threshold_k)
+        up_scores[i]=up
+        down_scores[i]=down
+
+    return np.maximum(up_scores,down_scores)
+
 
