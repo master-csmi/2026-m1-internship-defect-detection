@@ -47,5 +47,28 @@ def beat_feature_matrix(beat_matrix,fs=FS):
 
 
 
+# mean spectrum by class per beat class 
+def average_spectrum_by_class(beat_matrix,labels,fs=FS):
+    freqs,_=power_spectrum(beat_matrix[0],fs)
+    out={}
+    for cls in np.unique(labels):
+        rows=beat_matrix[labels==cls]
+        spectra = np.stack({power_spectrum(b,fs)[1] for b in rows})
+        out[str(cls)]=spectra.mean(axis=0)
+    return freqs, out
+
+
+# normalize the beats and get the maximum
+def spectral_anomaly_score(beat_matrix,fs=FS):
+    feature=beat_feature_matrix(beat_matrix,fs)
+    mu=feature.mean()
+    sd=feature.std()+1e-9
+    z=(feature-mu).abs()/sd
+    return z.max(axis=1).to_numpy()
+
+
+
+
+
 
 
