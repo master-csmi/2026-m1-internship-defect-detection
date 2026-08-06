@@ -53,7 +53,7 @@ def average_spectrum_by_class(beat_matrix,labels,fs=FS):
     out={}
     for cls in np.unique(labels):
         rows=beat_matrix[labels==cls]
-        spectra = np.stack({power_spectrum(b,fs)[1] for b in rows})
+        spectra = np.stack([power_spectrum(b,fs)[1] for b in rows])
         out[str(cls)]=spectra.mean(axis=0)
     return freqs, out
 
