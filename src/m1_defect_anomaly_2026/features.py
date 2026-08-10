@@ -50,3 +50,47 @@ def rr_intervals(r_peaks, fs=FS):
 
 
 
+# rhythm features: one row per beat, aligned with r_peaks
+# local_window = how many surrounding beats define "the patient's current rhythm"
+def hrv_features(r_peaks, fs=FS, local_window=10):
+    n = len(r_peaks)
+    # a record with 0 or 1 beat has no rhythm to describe
+    if n < 2:
+        return pd.DataFrame(index=range(n), columns=_HRV_COLUMNS, dtype=float).fillna(0.0)
+
+    rr = rr_intervals(r_peaks, fs)
+    fallback = float(np.median(rr))
+
+    #the first beat has no interval before it, the last has none after it
+    pre_rr = np.concatenate([[fallback], rr])
+    post_rr = np.concatenate([rr, [fallback]])
+
+    # successive difference centred on each beat: this is what RMSSD and pNN50 are built from
+    succ_diff = post_rr - pre_rr
+
+    pre_series = pd.Series(pre_rr)
+    diff_series = pd.Series(succ_diff)
+    roll = dict(window=local_window, center=True, min_periods=1)
+
+    local_rr_mean = pre_series.rolling(**roll).mean().to_numpy() # average beat duartion
+    local_sdnn = pre_series.rolling(**roll).std().fillna(0.0).to_numpy() # standard deviation
+    local_rmssd = np.sqrt((diff_series ** 2).rolling(**roll).mean().to_numpy()) # root mean squared of successive differences
+    local_pnn50 = (diff_series.abs() > 0.050).rolling(**roll).mean().to_numpy() # proportion of successive differences greater than 50 milliseconds
+
+    return pd.DataFrame({"pre_rr": pre_rr,
+                         "post_rr": post_rr,
+                         "rr_ratio": pre_rr / (post_rr + 1e-12),
+                         "local_rr_mean": local_rr_mean,
+                         "rr_deviation": pre_rr / (local_rr_mean + 1e-12),
+                         "local_sdnn": local_sdnn,
+                         "local_rmssd": local_rmssd,
+                         "local_pnn50": local_pnn50,
+                         "heart_rate": 60.0 / (pre_rr + 1e-12)})
+
+
+_HRV_COLUMNS = ["pre_rr", "post_rr", "rr_ratio", "local_rr_mean", "rr_deviation",
+                "local_sdnn", "local_rmssd", "local_pnn50", "heart_rate"]
+
+
+
+
