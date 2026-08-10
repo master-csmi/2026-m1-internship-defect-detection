@@ -1,5 +1,5 @@
 import numpy as np
-from m1_defect_anomaly_2026.features import time_domain_features, beat_time_feature_matrix, zero_crossings
+from m1_defect_anomaly_2026.features import time_domain_features, beat_time_feature_matrix, zero_crossings, rr_intervals, hrv_features
 
 
 
@@ -44,6 +44,13 @@ def test_matrix_has_one_row_per_beat():
     assert df.shape[0] == 7
     assert not df.isna().any().any()
 
+
+
+
+
+def test_rr_intervals_of_regular_rhythm():
+    peaks = np.arange(0, 3600, 360)          
+    assert np.allclose(rr_intervals(peaks, fs=360), 1.0) # we use allclose() instead of "==" because it's not fragile
 
 
 
