@@ -54,3 +54,33 @@ def test_rr_intervals_of_regular_rhythm():
 
 
 
+def test_hrv_has_one_row_per_beat():
+    peaks = np.arange(0, 3600, 360)
+    df = hrv_features(peaks, fs=360)
+    assert len(df) == len(peaks)
+    assert not df.isna().any().any()
+
+
+def test_regular_rhythm_gives_flat_hrv():
+    peaks = np.arange(0, 7200, 360)
+    df = hrv_features(peaks, fs=360)
+    assert np.allclose(df["rr_ratio"], 1.0)
+    assert np.allclose(df["heart_rate"], 60.0)
+    assert np.allclose(df["local_rmssd"], 0.0, atol=1e-9)
+
+
+def test_premature_beat_lowers_rr_ratio():
+    # regular 1 s rhythm, but beat 5 arrives early and is followed by a longer pause
+    peaks = [0, 360, 720, 1080, 1440, 1620, 2160, 2520, 2880, 3240]
+    df = hrv_features(np.array(peaks), fs=360)
+    assert df["rr_ratio"].iloc[5] < 0.6
+    assert df["rr_deviation"].iloc[5] < 0.8
+
+
+def test_single_beat_record_does_not_crash():
+    df = hrv_features(np.array([100]), fs=360)
+    assert len(df) == 1
+    assert np.isfinite(df.to_numpy()).all()
+
+
+
