@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from scipy.stats import skew, kurtosis
+from .preprocessing import FS
 
 
 # count how many times the signal crosses zero
@@ -40,6 +41,12 @@ def time_domain_features(beat):
 # apply time_domain_features to every beat of a record
 def beat_time_feature_matrix(beat_matrix):
     return pd.DataFrame([time_domain_features(b) for b in beat_matrix])
+
+
+
+# intervals between successive R-peaks, in seconds
+def rr_intervals(r_peaks, fs=FS):
+    return np.diff(np.asarray(r_peaks, dtype=float)) / fs
 
 
 
