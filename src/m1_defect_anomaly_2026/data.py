@@ -5,7 +5,7 @@ import time
 DEFAULT_DATA_DIR = "data/raw"
 
 # download the full MIT-BIH Arrhythmia Database
-def download_mitbih(dest_dir=DEFAULT_DATA_DIR, records=None, retries=3, delay=10):
+def download_mitbih(dest_dir=DEFAULT_DATA_DIR, records="all", retries=3, delay=10):
     os.makedirs(dest_dir, exist_ok=True)
     for attempt in range(retries):
         try:
