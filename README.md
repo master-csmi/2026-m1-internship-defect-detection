@@ -23,3 +23,29 @@ Main findings:
 ```bash
 pytest
 ```
+
+
+## Running with Docker
+
+```bash
+docker build -t ecg-anomaly .
+docker compose up
+```
+
+Then open the link with the token shown in the terminal.
+
+The ECG data is not inside the image. To download it once:
+
+```bash
+docker run --rm -v "$(pwd)/data:/app/data" ecg-anomaly \
+  python -c "from m1_defect_anomaly_2026.data import download_mitbih; download_mitbih()"
+```
+
+To run the tests in the container:
+
+```bash
+docker run --rm ecg-anomaly pytest
+```
+
+
+
