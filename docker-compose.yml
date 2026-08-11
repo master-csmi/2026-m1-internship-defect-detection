@@ -1,0 +1,10 @@
+# One "docker compose up" replaces a long docker run command with all its options.
+services:
+    notebook:
+        build: .
+        ports:
+            - "8888.8888"
+        volumes:
+            - ./data:/app/data
+            - ./results:/app/results
+            - ./notebooks:/app/notebooks
