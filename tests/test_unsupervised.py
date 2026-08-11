@@ -1,6 +1,8 @@
 import numpy as np
 from m1_defect_anomaly_2026.beats import RecordData
-from m1_defect_anomaly_2026.unsupervised import build_feature_matrix, build_split_matrix, feature_columns, fit_isolation_forest, anomaly_score
+from m1_defect_anomaly_2026.unsupervised import build_feature_matrix, build_split_matrix, feature_columns, fit_isolation_forest, anomaly_score, fit_one_class_svm, subsample
+
+
 
 
 # a fake record: a regular rhythm of one beat per second, where the beats listed
@@ -77,3 +79,49 @@ def test_isolation_forest_is_reproducible():
     first = anomaly_score(fit_isolation_forest(X, seed=42), X)
     second = anomaly_score(fit_isolation_forest(X, seed=42), X)
     assert np.allclose(first, second)
+
+
+
+
+
+def test_subsample_keeps_everything_when_the_set_is_small():
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(100, 4))
+    assert len(subsample(X, 500)) == 100
+
+
+def test_subsample_cuts_down_a_big_set_and_is_reproducible():
+    rng = np.random.default_rng(0)
+    X = rng.normal(size=(1000, 4))
+    first = subsample(X, 200, seed=1)
+    second = subsample(X, 200, seed=1)
+    assert len(first) == 200
+    assert np.allclose(first, second)
+
+
+def test_one_class_svm_gives_outliers_a_higher_score():
+    rng = np.random.default_rng(0)
+    normal = rng.normal(size=(300, 4))
+    outliers = rng.normal(loc=8.0, size=(10, 4))
+
+    model = fit_one_class_svm(normal)
+    assert anomaly_score(model, outliers).mean() > anomaly_score(model, normal).mean()
+
+
+def test_one_class_svm_returns_one_score_per_row():
+    rng = np.random.default_rng(1)
+    X = rng.normal(size=(50, 3))
+    scores = anomaly_score(fit_one_class_svm(X), X)
+    assert scores.shape == (50,)
+    assert np.isfinite(scores).all()
+
+
+# fitting on a sample must not change the number of beats we can score
+def test_one_class_svm_scores_every_beat_even_when_fitted_on_a_sample():
+    rng = np.random.default_rng(2)
+    X = rng.normal(size=(400, 4))
+    model = fit_one_class_svm(X, max_samples=100)
+    assert anomaly_score(model, X).shape == (400,)
+
+
+
