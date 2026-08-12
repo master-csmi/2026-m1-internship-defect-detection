@@ -1,5 +1,6 @@
 import numpy as np
-from m1_defect_anomaly_2026.supervised import fit_random_forest, fit_xgboost, predict_scores
+from m1_defect_anomaly_2026.supervised import fit_random_forest, fit_xgboost, predict_scores, shap_values, shap_importance
+import pandas as pd
 
 
 
@@ -57,4 +58,19 @@ def test_xgboost_scale_pos_weight_matches_the_class_imbalance():
     assert ratio in grid.param_grid["scale_pos_weight"]
 
 
+
+
+def test_shap_values_has_one_row_per_beat_and_one_column_per_feature():
+    X, y, groups = make_fake_data()
+    X = pd.DataFrame(X, columns=["f0", "f1", "f2", "f3"])
+    grid = fit_random_forest(X, y, groups, cv_splits=3)
+    X_sample, values = shap_values(grid.best_estimator_, X, sample_size=50)
+    assert values.shape == (len(X_sample), X.shape[1])
+
+
+def test_shap_importance_puts_the_informative_feature_first():
+    values = np.zeros((100, 3))
+    values[:, 1] = 5.0  # feature f1 drives every prediction
+    importance = shap_importance(values, ["f0", "f1", "f2"])
+    assert importance.index[0] == "f1"
 
