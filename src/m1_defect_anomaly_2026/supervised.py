@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import GridSearchCV, GroupKFold
+from sklearn.model_selection import GridSearchCV, GroupKFold, cross_val_predict
 from xgboost import XGBClassifier
 import shap
 from .unsupervised import subsample
+from sklearn.base import clone
 
 
 # small grid: enough to see whether tuning actually helps, without taking all day to run
@@ -82,6 +83,17 @@ def shap_values(model, X, sample_size=1000, seed=42):
 def shap_importance(values, feature_names):
     importance = np.abs(values).mean(axis=0)
     return pd.Series(importance, index=feature_names).sort_values(ascending=False)
+
+
+
+
+# the threshold is picked on DS1, but a model that already saw a beat while training is too
+# sure about it, so we score each beat with the folds that did not train on it
+def oof_scores(grid, X, y, groups, cv_splits=5):
+    model = clone(grid.best_estimator_)
+    cv = GroupKFold(n_splits=cv_splits)
+    proba = cross_val_predict(model, X, y, cv=cv, groups=groups, method="predict_proba")
+    return proba[:, 1]
 
 
 
