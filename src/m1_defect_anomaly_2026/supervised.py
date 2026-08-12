@@ -3,6 +3,8 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV, GroupKFold
 from xgboost import XGBClassifier
+import shap
+from .unsupervised import subsample
 
 
 # small grid: enough to see whether tuning actually helps, without taking all day to run
@@ -57,6 +59,29 @@ def predict_scores(grid, X):
     return grid.predict_proba(X)[:, 1]
 
 
+
+
+# SHAP says how much each feature pushed one beat towards "anomaly" or away from it
+# we explain a sample of the beats: 50 000 would be slow and the picture does not change
+def shap_values(model, X, sample_size=1000, seed=42):
+    X_sample = subsample(X, sample_size, seed)
+    explainer = shap.TreeExplainer(model)
+    values = explainer.shap_values(X_sample)
+
+    # Random Forest returns one array per class, XGBoost returns a single one
+    # in both cases we keep the anomaly class
+    if isinstance(values, list):
+        values = values[1]
+    elif values.ndim == 3:
+        values = values[:, :, 1]
+
+    return X_sample, values
+
+
+# average over all the beats: which features matter the most in general
+def shap_importance(values, feature_names):
+    importance = np.abs(values).mean(axis=0)
+    return pd.Series(importance, index=feature_names).sort_values(ascending=False)
 
 
 
