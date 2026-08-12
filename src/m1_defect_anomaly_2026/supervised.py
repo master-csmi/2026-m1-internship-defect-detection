@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV, GroupKFold
+from xgboost import XGBClassifier
 
 
 # small grid: enough to see whether tuning actually helps, without taking all day to run
@@ -29,6 +30,32 @@ def fit_random_forest(X, y, groups, param_grid=RF_PARAM_GRID, cv_splits=5, seed=
 # P(anomaly), same "high score = anomalous" idea as anomaly_score() for the unsupervised models
 def predict_scores(grid, X):
     return grid.predict_proba(X)[:, 1]
+
+
+# scale_pos_weight depends on how imbalanced y is, so it's built from y instead of a fixed number
+def fit_xgboost(X, y, groups, param_grid=None, cv_splits=5, seed=42):
+    if param_grid is None:
+        ratio = (y == 0).sum() / (y == 1).sum()
+        param_grid = {
+            "n_estimators": [200, 500],
+            "max_depth": [3, 6],
+            "learning_rate": [0.05, 0.1],
+            "scale_pos_weight": [1, ratio],
+        }
+    model = XGBClassifier(random_state=seed, eval_metric="logloss")
+    cv = GroupKFold(n_splits=cv_splits)
+    grid = GridSearchCV(model, param_grid, cv=cv, scoring="f1")
+    grid.fit(X, y, groups=groups)
+    return grid
+
+
+
+
+# P(anomaly), same "high score = anomalous" idea as anomaly_score() for the unsupervised models
+# works for both fit_random_forest() and fit_xgboost() results
+def predict_scores(grid, X):
+    return grid.predict_proba(X)[:, 1]
+
 
 
 
