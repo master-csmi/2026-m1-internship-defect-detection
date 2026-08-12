@@ -1,5 +1,5 @@
 import numpy as np
-from m1_defect_anomaly_2026.supervised import fit_random_forest, predict_scores
+from m1_defect_anomaly_2026.supervised import fit_random_forest, fit_xgboost, predict_scores
 
 
 
@@ -37,6 +37,24 @@ def test_predict_scores_returns_one_value_per_row():
     scores = predict_scores(grid, X)
     assert scores.shape == (len(X),)
     assert np.isfinite(scores).all()
+
+
+
+
+def test_xgboost_separates_the_two_classes():
+    X, y, groups = make_fake_data()
+    grid = fit_xgboost(X, y, groups, cv_splits=3)
+    scores = predict_scores(grid, X)
+    assert scores[y == 1].mean() > scores[y == 0].mean()
+
+
+
+
+def test_xgboost_scale_pos_weight_matches_the_class_imbalance():
+    X, y, groups = make_fake_data()
+    grid = fit_xgboost(X, y, groups, cv_splits=3)
+    ratio = (y == 0).sum() / (y == 1).sum()
+    assert ratio in grid.param_grid["scale_pos_weight"]
 
 
 
