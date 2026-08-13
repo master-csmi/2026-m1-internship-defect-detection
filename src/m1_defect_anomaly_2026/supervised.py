@@ -9,7 +9,7 @@ from sklearn.base import clone
 
 
 # small grid: enough to see whether tuning actually helps, without taking all day to run
-RF_PARAM_GRID = {"n_estimators": [200, 500],
+RF_PARAM_GRID = {
                  "max_depth": [None, 12],
                  "min_samples_leaf": [1, 4],
                  "class_weight": [None, "balanced"]}
@@ -21,9 +21,9 @@ RF_PARAM_GRID = {"n_estimators": [200, 500],
 # so the model can't partly learn a patient's own rhythm instead of the arrhythmia -
 # same idea as the DS1/DS2 split
 def fit_random_forest(X, y, groups, param_grid=RF_PARAM_GRID, cv_splits=5, seed=42):
-    model = RandomForestClassifier(random_state=seed)
+    model = RandomForestClassifier(n_estimators=200,random_state=seed)
     cv = GroupKFold(n_splits=cv_splits)
-    grid = GridSearchCV(model, param_grid, cv=cv, scoring="f1")
+    grid = GridSearchCV(model, param_grid, cv=cv, scoring="f1",n_jobs=-1, verbose=2)
     grid.fit(X, y, groups=groups)
     return grid
 
