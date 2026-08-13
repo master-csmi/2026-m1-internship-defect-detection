@@ -17,8 +17,31 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{enumitem}
+\usepackage{fancyhdr}
 %\usepackage[style=authoryear]{biblatex}
 %\addbibresource{references.bib}
+\renewcommand{\headrulewidth}{0.4pt}
+\usepackage{microtype}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{siunitx}
+\usepackage[capitalise,noabbrev]{cleveref}
+\usepackage[backend=biber,style=numeric-comp,sorting=nyt,
+            maxbibnames=6,minbibnames=3,giveninits=true,
+            doi=true,url=true,isbn=false]{biblatex}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Anomaly Detection on Time-Series Data}
+\fancyhead[R]{\small M1 CSMI 2026}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\addbibresource{references.bib}
+\graphicspath{{images/}{../results/}}
 
 
 \title{Anomaly Detection on Time-Series Data: \\
@@ -110,6 +133,105 @@ The aim of this internship is to develop, implement and evaluate methods for det
 anomalies in the time-series signals, using ECG as the main case study and considering
 vibration signals as an extension of the same framework. The work will rely on the MIT-BIH
 Arrhythmia database, distributed by PhysioNet. 
+
+\section{Mission and Objectives}
+\subsection{Assigned missions}
+\subsection{Measurable Objectivesand deliverables}
+\subsection{Constraints (data, schedule, tooling)}
+\subsection{My role}
+
+\section{Context}
+\subsection{Host structure and scientific environment}
+\subsection{Existing tools, datasets and imposed choices}
+\subsection{State of the art in ECG beat classification}
+
+\section{Data}
+\subsection{Origin, licence and ethics}
+\subsection{Description: records, sampling, annotations, AAMI classes}
+\subsection{Class imbalance and excluded records}
+\subsection{Inter-patient split DS1/DS2 and leakage control}
+\subsection{Pre-processing: filtering, beat segmentation, normalisation}
+\subsection{Relevence and limitations}
+
+\section{Evaluation Protocol}
+\subsection{Beat-level formulation of the detection problem}
+\subsection{Metrics under strong imbalance}
+\subsection{Threshold selection on DS1}
+\subsection{Reference baselines}
+
+
+\section{Statistical Baselines}
+\subsection{Z-score on sliding windows}
+\subsection{CUSUM}
+\subsection{Spectral features}
+\subsection{Results and discussion}
+
+
+\section{Feature Engineering and Unsupervised Detection}
+\subsection{Rhythm features}
+\subsection{Morphological features}
+\subsection{Wavelet features}
+\subsection{Isolation Forest}
+\subsection{One-class SVM}
+\subsection{Results and discussion}
+
+\section{Supervised Classification}
+\subsection{Random Forest}
+\subsection{Gradient Boosting (XGBoost)}
+\subsection{Handling imbalance}
+\subsection{Interpretability with SHAP}
+\subsection{Results and per-class analysis}
+
+\section{Deep Learning: Autoencoders}
+\subsection{Principle: recontruction error as anomaly score}
+\subsection{Convolutional autoencoder}
+\subsection{Recurrent autoencoder}
+\subsection{Training and convergence}
+\subsection{Results}
+
+\section{Software Contributions}
+\subsection{Package architecture}
+\subsection{Notebooks and reproduccible workflow}
+\subsection{Containerisation}
+\subsection{Continuous integration}
+
+
+\section{Verification}
+\subsection{Test strategy: unit tests, toy cases, invariants}
+\subsection{Correctness of the metrics}
+\subsection{Convergence of the training loss}
+\subsection{Reproducibility: seeds, environment, container digest, data checksum}
+\subsection{Computational cost and data scaling}
+\subsection{Ablations}
+\subsection{Experiment traceability table}
+
+\section{Validation}
+\subsection{Comparison with published results on the same protocol}
+\subsection{Clinical relevance of the errors}
+\subsection{Domain of validity and limits}
+
+
+\section{Uncertainty Quantification}
+\subsection{Bootstrap confidence intervals}
+\subsection{Per-record variability}
+\subsection{Threshold sensitivity}
+\subsection{Impact on the conclusions}
+
+
+
+\section{Results and Discussion}
+\subsection{Overall comparison}
+\subsection{What supervision actually buys}
+\subsection{The S-class ceiling}
+\subsection{Transfer to vibration signals}
+
+
+\section{Conclusion}
+\subsection{Contributions}
+\subsection{Limitations and technical debt}
+\subsection{Perspectives}
+
+\section*{References}
 
 
 
