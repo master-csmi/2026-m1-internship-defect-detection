@@ -1,5 +1,5 @@
 import numpy as np
-from m1_defect_anomaly_2026.supervised import fit_random_forest, fit_xgboost, predict_scores, shap_values, shap_importance
+from m1_defect_anomaly_2026.supervised import fit_random_forest, fit_xgboost, predict_scores, shap_values, shap_importance, oof_scores
 import pandas as pd
 
 
@@ -73,4 +73,14 @@ def test_shap_importance_puts_the_informative_feature_first():
     values[:, 1] = 5.0  # feature f1 drives every prediction
     importance = shap_importance(values, ["f0", "f1", "f2"])
     assert importance.index[0] == "f1"
+
+
+
+
+def test_oof_scores_gives_one_score_per_beat():
+    X, y, groups = make_fake_data()
+    grid = fit_random_forest(X, y, groups, cv_splits=3)
+    scores = oof_scores(grid, X, y, groups, cv_splits=3)
+    assert scores.shape == (len(X),)
+    assert np.isfinite(scores).all()
 
