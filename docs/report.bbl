@@ -16,5 +16,453 @@
   {}
 \endgroup
 
+
+\refsection{0}
+  \datalist[entry]{nyt/global//global/global}
+    \entry{aami2012ec57}{manual}{}
+      \list{location}{1}{%
+        {Arlington, VA, USA}%
+      }
+      \list{organization}{1}{%
+        {Association for the Advancement of Medical Instrumentation}%
+      }
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labeltitlesource}{title}
+      \field{title}{{ANSI/AAMI EC57:2012} --- Testing and Reporting Performance Results of Cardiac Rhythm and {ST} Segment Measurement Algorithms}
+      \field{year}{2012}
+    \endentry
+    \entry{chandola2009survey}{article}{}
+      \name{author}{3}{}{%
+        {{hash=818074037ed2f89ce51237af38dec11f}{%
+           family={Chandola},
+           familyi={C\bibinitperiod},
+           given={Varun},
+           giveni={V\bibinitperiod}}}%
+        {{hash=4ddb7b9c38d8c15a70bc573ba4e51ea9}{%
+           family={Banerjee},
+           familyi={B\bibinitperiod},
+           given={Arindam},
+           giveni={A\bibinitperiod}}}%
+        {{hash=efb90d78e35ff61d3bc639f5c6f3d822}{%
+           family={Kumar},
+           familyi={K\bibinitperiod},
+           given={Vipin},
+           giveni={V\bibinitperiod}}}%
+      }
+      \strng{namehash}{135c55bbecd240d054a5541e3cf77609}
+      \strng{fullhash}{135c55bbecd240d054a5541e3cf77609}
+      \strng{bibnamehash}{135c55bbecd240d054a5541e3cf77609}
+      \strng{authorbibnamehash}{135c55bbecd240d054a5541e3cf77609}
+      \strng{authornamehash}{135c55bbecd240d054a5541e3cf77609}
+      \strng{authorfullhash}{135c55bbecd240d054a5541e3cf77609}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{ACM Computing Surveys}
+      \field{number}{3}
+      \field{title}{Anomaly Detection: A Survey}
+      \field{volume}{41}
+      \field{year}{2009}
+      \field{pages}{1\bibrangedash 58}
+      \range{pages}{58}
+      \verb{doi}
+      \verb 10.1145/1541880.1541882
+      \endverb
+    \endentry
+    \entry{dechazal2004}{article}{}
+      \name{author}{3}{}{%
+        {{hash=8cc78c28ab9bba1804c32c877095dec1}{%
+           family={Chazal},
+           familyi={C\bibinitperiod},
+           given={Philip},
+           giveni={P\bibinitperiod},
+           prefix={de},
+           prefixi={d\bibinitperiod}}}%
+        {{hash=e2989cd5582bee6e12754d1431fb42d3}{%
+           family={O'Dwyer},
+           familyi={O\bibinitperiod},
+           given={Maria},
+           giveni={M\bibinitperiod}}}%
+        {{hash=de62edad37526aed8556911e22642355}{%
+           family={Reilly},
+           familyi={R\bibinitperiod},
+           given={Richard\bibnamedelima B.},
+           giveni={R\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+      }
+      \strng{namehash}{e19c8ba7f8006a60a23be7c479dff7c9}
+      \strng{fullhash}{e19c8ba7f8006a60a23be7c479dff7c9}
+      \strng{bibnamehash}{e19c8ba7f8006a60a23be7c479dff7c9}
+      \strng{authorbibnamehash}{e19c8ba7f8006a60a23be7c479dff7c9}
+      \strng{authornamehash}{e19c8ba7f8006a60a23be7c479dff7c9}
+      \strng{authorfullhash}{e19c8ba7f8006a60a23be7c479dff7c9}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Biomedical Engineering}
+      \field{number}{7}
+      \field{title}{Automatic Classification of Heartbeats Using {ECG} Morphology and Heartbeat Interval Features}
+      \field{volume}{51}
+      \field{year}{2004}
+      \field{pages}{1196\bibrangedash 1206}
+      \range{pages}{11}
+      \verb{doi}
+      \verb 10.1109/TBME.2004.827359
+      \endverb
+    \endentry
+    \entry{goldberger2000physionet}{article}{}
+      \name{author}{10}{}{%
+        {{hash=c99be12ffae540b5ba4cb3a23ee3ec0a}{%
+           family={Goldberger},
+           familyi={G\bibinitperiod},
+           given={Ary\bibnamedelima L.},
+           giveni={A\bibinitperiod\bibinitdelim L\bibinitperiod}}}%
+        {{hash=22c61ac7a4c1cfb66b48ed8f90dd69d7}{%
+           family={Amaral},
+           familyi={A\bibinitperiod},
+           given={Luis\bibnamedelimb A.\bibnamedelimi N.},
+           giveni={L\bibinitperiod\bibinitdelim A\bibinitperiod\bibinitdelim N\bibinitperiod}}}%
+        {{hash=6b2678a928f4aaa1dbcc238adf866993}{%
+           family={Glass},
+           familyi={G\bibinitperiod},
+           given={Leon},
+           giveni={L\bibinitperiod}}}%
+        {{hash=bb1b55fa34693d71ca9e1104f846fa42}{%
+           family={Hausdorff},
+           familyi={H\bibinitperiod},
+           given={Jeffrey\bibnamedelima M.},
+           giveni={J\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=b0f592c3910ad2fd1d9791d16e601ce3}{%
+           family={Ivanov},
+           familyi={I\bibinitperiod},
+           given={Plamen\bibnamedelima Ch.},
+           giveni={P\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+        {{hash=2193bac90baddb616fc4dcd2f366de81}{%
+           family={Mark},
+           familyi={M\bibinitperiod},
+           given={Roger\bibnamedelima G.},
+           giveni={R\bibinitperiod\bibinitdelim G\bibinitperiod}}}%
+        {{hash=5222afca7b17d3624464c48bdb21e705}{%
+           family={Mietus},
+           familyi={M\bibinitperiod},
+           given={Joseph\bibnamedelima E.},
+           giveni={J\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=71ab5dbee9c717c687e1b2c142bce563}{%
+           family={Moody},
+           familyi={M\bibinitperiod},
+           given={George\bibnamedelima B.},
+           giveni={G\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=07ec0b651afc3688b2dc4aecaa9f4fba}{%
+           family={Peng},
+           familyi={P\bibinitperiod},
+           given={Chung-Kang},
+           giveni={C\bibinithyphendelim K\bibinitperiod}}}%
+        {{hash=5f5c56c0c8f34aa567709e10df5afd57}{%
+           family={Stanley},
+           familyi={S\bibinitperiod},
+           given={H.\bibnamedelimi Eugene},
+           giveni={H\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+      }
+      \strng{namehash}{ac33f54eb3663cac88ca522e0018a750}
+      \strng{fullhash}{99ff5ab6ac3f9e1b8b06c69e0c579fee}
+      \strng{bibnamehash}{7f2a30c1b4510d3178ec23ac186fb23b}
+      \strng{authorbibnamehash}{7f2a30c1b4510d3178ec23ac186fb23b}
+      \strng{authornamehash}{ac33f54eb3663cac88ca522e0018a750}
+      \strng{authorfullhash}{99ff5ab6ac3f9e1b8b06c69e0c579fee}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Circulation}
+      \field{number}{23}
+      \field{title}{{PhysioBank}, {PhysioToolkit}, and {PhysioNet}: Components of a New Research Resource for Complex Physiologic Signals}
+      \field{volume}{101}
+      \field{year}{2000}
+      \field{pages}{e215\bibrangedash e220}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.1161/01.CIR.101.23.e215
+      \endverb
+    \endentry
+    \entry{lei2018review}{article}{}
+      \name{author}{6}{}{%
+        {{hash=1a3febc90d8f073e62656f05ef6ec1b8}{%
+           family={Lei},
+           familyi={L\bibinitperiod},
+           given={Yaguo},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=5db61e9d72f627b5753ff48d866c9c57}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Naipeng},
+           giveni={N\bibinitperiod}}}%
+        {{hash=017a2ae3ddc2589c04c46ea992861ad2}{%
+           family={Guo},
+           familyi={G\bibinitperiod},
+           given={Liang},
+           giveni={L\bibinitperiod}}}%
+        {{hash=314274f033547611badc4b89f3d897cf}{%
+           family={Li},
+           familyi={L\bibinitperiod},
+           given={Ningbo},
+           giveni={N\bibinitperiod}}}%
+        {{hash=126eb2626ab18d7d0a7a59b18b3e1980}{%
+           family={Yan},
+           familyi={Y\bibinitperiod},
+           given={Tao},
+           giveni={T\bibinitperiod}}}%
+        {{hash=0b8be9667199be795ead5d6b0aa56b61}{%
+           family={Lin},
+           familyi={L\bibinitperiod},
+           given={Jing},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{4b31e558fd367880729961fb93bc6c40}
+      \strng{fullhash}{cf6e5187470bfbc160950ab1f80ec1b1}
+      \strng{bibnamehash}{cf6e5187470bfbc160950ab1f80ec1b1}
+      \strng{authorbibnamehash}{cf6e5187470bfbc160950ab1f80ec1b1}
+      \strng{authornamehash}{4b31e558fd367880729961fb93bc6c40}
+      \strng{authorfullhash}{cf6e5187470bfbc160950ab1f80ec1b1}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Mechanical Systems and Signal Processing}
+      \field{title}{Machinery Health Prognostics: A Systematic Review from Data Acquisition to {RUL} Prediction}
+      \field{volume}{104}
+      \field{year}{2018}
+      \field{pages}{799\bibrangedash 834}
+      \range{pages}{36}
+      \verb{doi}
+      \verb 10.1016/j.ymssp.2017.11.016
+      \endverb
+    \endentry
+    \entry{luz2016survey}{article}{}
+      \name{author}{4}{}{%
+        {{hash=ae119131a56600b8db3af40e082e36d5}{%
+           family={Luz},
+           familyi={L\bibinitperiod},
+           given={Eduardo\bibnamedelimb José\bibnamedelimb da\bibnamedelima S.},
+           giveni={E\bibinitperiod\bibinitdelim J\bibinitperiod\bibinitdelim d\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=e8583752e2e4ba28b930f4f4b35cbaaf}{%
+           family={Schwartz},
+           familyi={S\bibinitperiod},
+           given={William\bibnamedelima Robson},
+           giveni={W\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=21b8ff087676648ff4b120d27bebac99}{%
+           family={Cámara-Chávez},
+           familyi={C\bibinithyphendelim C\bibinitperiod},
+           given={Guillermo},
+           giveni={G\bibinitperiod}}}%
+        {{hash=9e95e1940aac95fefdb547cd1019928c}{%
+           family={Menotti},
+           familyi={M\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{28ef35a56596fbfded25573fc2249915}
+      \strng{fullhash}{76e5a3ae5e0a0f55fe40995ed42128b6}
+      \strng{bibnamehash}{76e5a3ae5e0a0f55fe40995ed42128b6}
+      \strng{authorbibnamehash}{76e5a3ae5e0a0f55fe40995ed42128b6}
+      \strng{authornamehash}{28ef35a56596fbfded25573fc2249915}
+      \strng{authorfullhash}{76e5a3ae5e0a0f55fe40995ed42128b6}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Computer Methods and Programs in Biomedicine}
+      \field{title}{{ECG}-Based Heartbeat Classification for Arrhythmia Detection: A Survey}
+      \field{volume}{127}
+      \field{year}{2016}
+      \field{pages}{144\bibrangedash 164}
+      \range{pages}{21}
+      \verb{doi}
+      \verb 10.1016/j.cmpb.2015.12.008
+      \endverb
+    \endentry
+    \entry{csmiguide}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=8d3e075936d57d7dade5293f214b3a3f}{%
+           family={{Master CSMI, Université de Strasbourg}},
+           familyi={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{8d3e075936d57d7dade5293f214b3a3f}
+      \strng{fullhash}{8d3e075936d57d7dade5293f214b3a3f}
+      \strng{bibnamehash}{8d3e075936d57d7dade5293f214b3a3f}
+      \strng{authorbibnamehash}{8d3e075936d57d7dade5293f214b3a3f}
+      \strng{authornamehash}{8d3e075936d57d7dade5293f214b3a3f}
+      \strng{authorfullhash}{8d3e075936d57d7dade5293f214b3a3f}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://csmi.cemosis.fr/fr/csmi/stages/guide.html}}
+      \field{note}{Accessed: 2026-08-13}
+      \field{title}{Guide du rapport de stage}
+      \field{year}{2025}
+    \endentry
+    \entry{moody2001mitbih}{article}{}
+      \name{author}{2}{}{%
+        {{hash=71ab5dbee9c717c687e1b2c142bce563}{%
+           family={Moody},
+           familyi={M\bibinitperiod},
+           given={George\bibnamedelima B.},
+           giveni={G\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=2193bac90baddb616fc4dcd2f366de81}{%
+           family={Mark},
+           familyi={M\bibinitperiod},
+           given={Roger\bibnamedelima G.},
+           giveni={R\bibinitperiod\bibinitdelim G\bibinitperiod}}}%
+      }
+      \strng{namehash}{c4df7241023127cc650d6cb0e52f20da}
+      \strng{fullhash}{c4df7241023127cc650d6cb0e52f20da}
+      \strng{bibnamehash}{c4df7241023127cc650d6cb0e52f20da}
+      \strng{authorbibnamehash}{c4df7241023127cc650d6cb0e52f20da}
+      \strng{authornamehash}{c4df7241023127cc650d6cb0e52f20da}
+      \strng{authorfullhash}{c4df7241023127cc650d6cb0e52f20da}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Engineering in Medicine and Biology Magazine}
+      \field{number}{3}
+      \field{title}{The Impact of the {MIT-BIH} Arrhythmia Database}
+      \field{volume}{20}
+      \field{year}{2001}
+      \field{pages}{45\bibrangedash 50}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1109/51.932724
+      \endverb
+    \endentry
+    \entry{randall2011bearing}{article}{}
+      \name{author}{2}{}{%
+        {{hash=ff9fdebf11515a32b4cd580da1b011a5}{%
+           family={Randall},
+           familyi={R\bibinitperiod},
+           given={Robert\bibnamedelima B.},
+           giveni={R\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=cf445f5070d1454234211232c355eb6b}{%
+           family={Antoni},
+           familyi={A\bibinitperiod},
+           given={Jérôme},
+           giveni={J\bibinitperiod}}}%
+      }
+      \strng{namehash}{c95f1c1c6bcafa8b4b3be1c6249d1cfb}
+      \strng{fullhash}{c95f1c1c6bcafa8b4b3be1c6249d1cfb}
+      \strng{bibnamehash}{c95f1c1c6bcafa8b4b3be1c6249d1cfb}
+      \strng{authorbibnamehash}{c95f1c1c6bcafa8b4b3be1c6249d1cfb}
+      \strng{authornamehash}{c95f1c1c6bcafa8b4b3be1c6249d1cfb}
+      \strng{authorfullhash}{c95f1c1c6bcafa8b4b3be1c6249d1cfb}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Mechanical Systems and Signal Processing}
+      \field{number}{2}
+      \field{title}{Rolling Element Bearing Diagnostics---A Tutorial}
+      \field{volume}{25}
+      \field{year}{2011}
+      \field{pages}{485\bibrangedash 520}
+      \range{pages}{36}
+      \verb{doi}
+      \verb 10.1016/j.ymssp.2010.07.017
+      \endverb
+    \endentry
+    \entry{ruff2021unifying}{article}{}
+      \name{author}{8}{}{%
+        {{hash=002c037bd5c44a3c55a7523254ff0522}{%
+           family={Ruff},
+           familyi={R\bibinitperiod},
+           given={Lukas},
+           giveni={L\bibinitperiod}}}%
+        {{hash=0d4533680966efc37ecb052578d0eb1f}{%
+           family={Kauffmann},
+           familyi={K\bibinitperiod},
+           given={Jacob\bibnamedelima R.},
+           giveni={J\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=e1b687cefe38cff11ee17bf85ec432bf}{%
+           family={Vandermeulen},
+           familyi={V\bibinitperiod},
+           given={Robert\bibnamedelima A.},
+           giveni={R\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=e0889b25b37f68a2d73747dc5dfcb8a0}{%
+           family={Montavon},
+           familyi={M\bibinitperiod},
+           given={Grégoire},
+           giveni={G\bibinitperiod}}}%
+        {{hash=7f49b6382ab4ca917a2aa2249f875f79}{%
+           family={Samek},
+           familyi={S\bibinitperiod},
+           given={Wojciech},
+           giveni={W\bibinitperiod}}}%
+        {{hash=5f7a97296025f5dcf9ed79d67caa64fc}{%
+           family={Kloft},
+           familyi={K\bibinitperiod},
+           given={Marius},
+           giveni={M\bibinitperiod}}}%
+        {{hash=f9a517f99d8450b78124ea4348265e82}{%
+           family={Dietterich},
+           familyi={D\bibinitperiod},
+           given={Thomas\bibnamedelima G.},
+           giveni={T\bibinitperiod\bibinitdelim G\bibinitperiod}}}%
+        {{hash=9f1b6144a45b1967e989e74552e37ada}{%
+           family={Müller},
+           familyi={M\bibinitperiod},
+           given={Klaus-Robert},
+           giveni={K\bibinithyphendelim R\bibinitperiod}}}%
+      }
+      \strng{namehash}{f49556d617d4a5ffe2baa6d71026cde2}
+      \strng{fullhash}{a09c781c6451282e18378c2eade6342b}
+      \strng{bibnamehash}{13ed84110db233e1ca17513f1dd83776}
+      \strng{authorbibnamehash}{13ed84110db233e1ca17513f1dd83776}
+      \strng{authornamehash}{f49556d617d4a5ffe2baa6d71026cde2}
+      \strng{authorfullhash}{a09c781c6451282e18378c2eade6342b}
+      \field{sortinit}{R}
+      \field{sortinithash}{5e1c39a9d46ffb6bebd8f801023a9486}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Proceedings of the IEEE}
+      \field{number}{5}
+      \field{title}{A Unifying Review of Deep and Shallow Anomaly Detection}
+      \field{volume}{109}
+      \field{year}{2021}
+      \field{pages}{756\bibrangedash 795}
+      \range{pages}{40}
+      \verb{doi}
+      \verb 10.1109/JPROC.2021.3052449
+      \endverb
+    \endentry
+    \entry{taskforce1996hrv}{article}{}
+      \name{author}{1}{}{%
+        {{hash=e3af9d001e56b1a42ee6871255e2643b}{%
+           family={{Task Force of the European Society of Cardiology and the North American Society of Pacing and Electrophysiology}},
+           familyi={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{e3af9d001e56b1a42ee6871255e2643b}
+      \strng{fullhash}{e3af9d001e56b1a42ee6871255e2643b}
+      \strng{bibnamehash}{e3af9d001e56b1a42ee6871255e2643b}
+      \strng{authorbibnamehash}{e3af9d001e56b1a42ee6871255e2643b}
+      \strng{authornamehash}{e3af9d001e56b1a42ee6871255e2643b}
+      \strng{authorfullhash}{e3af9d001e56b1a42ee6871255e2643b}
+      \field{sortinit}{T}
+      \field{sortinithash}{9af77f0292593c26bde9a56e688eaee9}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Circulation}
+      \field{number}{5}
+      \field{title}{Heart Rate Variability: Standards of Measurement, Physiological Interpretation, and Clinical Use}
+      \field{volume}{93}
+      \field{year}{1996}
+      \field{pages}{1043\bibrangedash 1065}
+      \range{pages}{23}
+      \verb{doi}
+      \verb 10.1161/01.CIR.93.5.1043
+      \endverb
+    \endentry
+  \enddatalist
+\endrefsection
 \endinput
 

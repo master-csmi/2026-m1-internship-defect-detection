@@ -94,51 +94,120 @@
 \tableofcontents
 \newpage
 
-\section{Introduction}
+\section{Introduction} \label{sec:introduction}
 
+
+\subsection{The electrocardiogram and cardiac arrhythmias} \label{subsec:ecg}
 
 Every heartbeat produces a small electrical signal that travels through the body and can be
-recorded at the skin's surface. The resulting trace from the electrocardiogram (ECG)
-is one of the oldest and most widely used diagnostic tools in medicine. In a healthy heart,
-this signal repeats itself (same characteristic shape) beat after beat. When something
-goes wrong, the shape and timing of the beat change. These irregularities are called 
-arrhythmias and some of them are early warnings of serious cardiac conditions.\\
+recorded at the skin's surface. The resulting trace, the electrocardiogram (ECG), is one of
+the oldest and most widely used diagnostic tools in medicine. In a healthy heart the signal
+repeats itself beat after beat with the same characteristic shape: a P wave, a sharp QRS
+complex and a T wave, separated by intervals whose duration is itself clinically
+meaningful~\cite{taskforce1996hrv}. When something goes wrong, the shape of the beat, its
+timing, or both, change. These irregularities are called arrhythmias, and some of them are
+early warnings of serious cardiac conditions~\cite{luz2016survey}.
 
-The difficulty is that arrhythmias are rare. Over twenty-four hours of monitoring,
-a patient produces more than a hundred thousand beats of which only a small fraction are
-abnormal. Reviewing such a recording manually is slow, tiring, precisely because the 
-interesting events are buried in a vast amount of unremarkable data. The only solution is 
-to automate the search by building a system that learns what a normal beat looks like
-and flags anything that departs from it.\\
+The difficulty is that arrhythmias are rare. At a resting rate of \SI{70}{\per\minute} a
+patient produces more than one hundred thousand beats over twenty-four hours of monitoring,
+of which only a small fraction are abnormal. The reference database used in this work, the
+MIT-BIH Arrhythmia Database~\cite{moody2001mitbih}, was assembled precisely to capture this
+regime: it contains roughly \num{110000} expert-annotated beats, and even though the records
+were deliberately selected to include clinically significant arrhythmias, normal beats still
+dominate by a wide margin. Reviewing such a recording manually is slow and tiring, precisely
+because the interesting events are buried in a vast amount of unremarkable data. The natural
+response is to automate the search: to build a system that learns what a normal beat looks
+like and flags anything that departs from it.
 
-This problem isn't unique to medicine. In industry, rotating machines produce vibration
-signals that behave the same way. A machine in good condition vibrates with a stable
-repetitive pattern. As a fault develops, whether through misalignment or a growing crack,
-that pattern changes before the machine actually fails. Detecting these early changes 
-is the foundation of predictive maintenance which aims to intervene before a breakdown
-rather than after it.\\
 
-Despite coming from different worlds, the two situations share the same structure.
-In both, we observe a one-dimensional signal that evolves over time, the signal is mostly normal
-and occasionally not. In both the central question is the same: how can a system
-automatically recognise what departs from normal behavior, without being told in advance
-what every possible abnormality looks like?\\
 
-This last point is what makes the problem interesting rather than
-routine. Anomalies are not simply a second class to be recognised alongside the first.
-They are rare, varied and new ones can always appear. What we need is a methos that 
-builds a strong model of normality and treats significaant deviation from it as suspicious. \\
 
-The aim of this internship is to develop, implement and evaluate methods for detecting 
-anomalies in the time-series signals, using ECG as the main case study and considering
-vibration signals as an extension of the same framework. The work will rely on the MIT-BIH
-Arrhythmia database, distributed by PhysioNet. 
+\subsection{The same problem in industry} \label{subsec:vibration}
+
+This problem is not unique to medicine. In industry, rotating machines produce vibration
+signals that behave in the same way. A machine in good condition vibrates with a stable,
+repetitive pattern governed by its rotation speed and its geometry. As a fault develops,
+whether through misalignment, imbalance or a growing crack in a bearing race, that pattern
+changes before the machine actually fails, and the change is visible in the statistics and
+in the spectrum of the vibration signal long before it is audible to an
+operator~\cite{randall2011bearing}. Detecting these early changes is the foundation of
+predictive maintenance, which aims to intervene before a breakdown rather than after
+it~\cite{lei2018review}.
+
+Despite coming from different worlds, the two situations share the same structure. In both
+we observe a one-dimensional signal that evolves over time; in both the signal is mostly
+normal and occasionally not; and in both the abnormal segments are rare, diverse, and costly
+to label. In both, the central question is the same: how can a system automatically recognise
+what departs from normal behaviour, without being told in advance what every possible
+abnormality looks like?
+
+\subsection{Why anomaly detection rather than classification} \label{subsec:why-anomaly-detection}
+
+This last point is what makes the problem interesting rather than routine. Anomalies are not
+simply a second class to be recognised alongside the first. They are rare, they are varied,
+and new ones can always appear. A classifier trained to separate two balanced classes assumes
+that both are well represented in the training data and that the test data will be drawn from
+the same distribution; neither assumption holds here. Anomaly detection instead builds a model
+of normality from data that is overwhelmingly normal, and treats a significant deviation from
+that model as suspicious~\cite{chandola2009survey}. The literature distinguishes several
+regimes along this axis, from fully supervised classification to purely unsupervised novelty
+detection, and the choice between them is driven by how many labels are available and how much
+one is willing to assume about the anomalies~\cite{ruff2021unifying}.
+
+The MIT-BIH database is unusual in that it is fully annotated, which means both regimes can be
+studied on exactly the same data. That is the opportunity this work exploits: rather than
+choosing one approach, we implement methods from the whole spectrum (statistical control
+charts, unsupervised detectors, and supervised classifiers) and evaluate them under a single
+protocol. The labels are then used in two different roles: withheld, to simulate the realistic
+situation where none exist, and used, to measure exactly what supervision buys.
+
+
+\subsection{Objectives and outline of the report} \label{subsec:objectives}
+
+The aim of this internship is to develop, implement and evaluate methods for detecting
+anomalies in time-series signals, using the ECG as the main case study and treating vibration
+signals as an extension of the same framework. The work relies on the MIT-BIH Arrhythmia
+Database, distributed by PhysioNet~\cite{goldberger2000physionet}. Four objectives structure
+the work:
+
+\begin{enumerate}[label=(O\arabic*)]
+  \item establish a rigorous and reproducible evaluation protocol, based on the AAMI EC57
+        beat groupings~\cite{aami2012ec57} and on the inter-patient train/test split
+        introduced by de Chazal et al.~\cite{dechazal2004}, so that no patient contributes to
+        both training and testing and the results remain comparable with published work;
+  \item implement a graded sequence of detection methods, from simple statistical baselines
+        through unsupervised models to supervised classifiers, all measured with the same
+        metrics on the same test set;
+  \item quantify what the addition of labels actually contributes, and identify which classes
+        of arrhythmia remain difficult and why;
+  \item deliver the whole study as reproducible software (an installable package, a test
+        suite, continuous integration and a container image) so that every number in this
+        report can be regenerated.
+\end{enumerate}
+
+The report follows the structure recommended by the CSMI internship
+guide~\cite{csmiguide}. Section~\ref{sec:missions} states the missions and the measurable
+objectives, and Section~\ref{sec:context} describes the scientific and technical context.
+Section~\ref{sec:data} documents the dataset: its origin, its licence, its statistics, the
+split, and its limitations. Section~\ref{sec:evaluation} fixes the evaluation protocol and
+justifies the choice of metrics under strong class imbalance. The methods are then presented
+in increasing order of sophistication: statistical baselines in Section~\ref{sec:baselines},
+feature engineering and unsupervised detection in Section~\ref{sec:unsupervised}, and
+supervised classification in Section~\ref{sec:supervised}. Section~\ref{sec:software}
+describes the software contributions. Sections~\ref{sec:verification}
+to~\ref{sec:uq} address verification, validation and uncertainty quantification in turn.
+Section~\ref{sec:results} compares all methods and discusses the results, and
+Section~\ref{sec:conclusion} concludes with the limitations of the work and the directions it
+opens.
+
+
 
 \section{Mission and Objectives}
 \subsection{Assigned missions}
 \subsection{Measurable Objectivesand deliverables}
 \subsection{Constraints (data, schedule, tooling)}
 \subsection{My role}
+
 
 \section{Context}
 \subsection{Host structure and scientific environment}
