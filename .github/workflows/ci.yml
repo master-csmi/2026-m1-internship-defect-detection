@@ -19,7 +19,9 @@ jobs:
           python-version: "3.11"
       
       - name: Install dependencies
-        run: pip install -e ".[notebook]"
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -e ".[notebook,deep]"
 
       - name: Download test data (record 100 only)
         run: python -c "from m1_defect_anomaly_2026.data import download_mitbih; download_mitbih(records=['100'])"

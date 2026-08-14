@@ -5,9 +5,20 @@ M1 internship 2026: Detecting abnormal heartbeats in ECG signals.
 ## Setup
 
 ```bash
-pip install -e ".[notebook]"
+
 python -c "from m1_defect_anomaly_2026.data import download_mitbih; download_mitbih()"
 ```
+
+Notebooks 05 and 06 use PyTorch. Install the CPU build first, otherwise pip pulls the CUDA wheel and its ~2.5 GB of nvidia libraries:
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+pip install -e ".[notebook,deep]"
+```
+
+Without it the rest of the project still works and `tests/test_autoencoders.py` is skipped.
+
+
 
 ## Exploratory Data Analysis
 
