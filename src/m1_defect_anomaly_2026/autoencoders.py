@@ -155,7 +155,7 @@ class LstmAutoencoder(nn.Module):
         self.encoder = nn.LSTM(1, self.hidden_size, num_layers=num_layers, batch_first=True)
         self.to_latent = nn.Linear(self.hidden_size, latent_dim)
         self.from_latent = nn.Linear(latent_dim, self.hidden_size)
-        self.decoder = nn.LSTM(self.hidden_size, self.hidden_size,
+        self.decoder = nn.LSTM(self.hidden_size+1, self.hidden_size,
                                num_layers=num_layers, batch_first=True)
         self.head = nn.Linear(self.hidden_size, 1)
 
@@ -165,7 +165,10 @@ class LstmAutoencoder(nn.Module):
 
     def decode(self, z, length):
         seed = self.from_latent(z).unsqueeze(1).repeat(1, length, 1)
-        out, _ = self.decoder(seed)
+        # without this the decoder gets an identical input at all 120 steps and cannot
+        # tell the start of the window from its end, so it collapses to a flat line
+        clock = torch.linspace(0, 1, length, device=z.device).view(1, length, 1)
+        out, _ = self.decoder(torch.cat([seed, clock.expand(z.shape[0], -1, -1)], dim=-1))
         return self.head(out).squeeze(-1)
 
     def forward(self, x):

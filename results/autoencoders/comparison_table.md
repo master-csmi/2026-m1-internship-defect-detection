@@ -12,4 +12,5 @@
 | Random baseline                           |       0.11  |    0.996 | 0.198 |     0.5   |
 | Z-score (1s window)                       |       0.11  |    0.997 | 0.198 |     0.274 |
 | 1D CNN autoencoder                        |       0.299 |    0.088 | 0.136 |     0.816 |
+| LSTM autoencoder                          |       0.234 |    0.069 | 0.106 |     0.703 |
 | 1D CNN autoencoder (trained on all beats) |       0.106 |    0.037 | 0.054 |     0.742 |
