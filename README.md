@@ -65,6 +65,7 @@ measured on DS2, so no patient is ever in both. All the numbers below are on DS2
 | Random baseline | 0.110 | 0.996 | 0.198 | 0.500 |
 | Z-score, 1s window (statistical) | 0.110 | 0.997 | 0.198 | 0.274 |
 
+
 Main findings:
 - The supervised models win clearly: F1 0.721 against 0.427 for the best unsupervised one.
 - What the labels bring is precision, not recall. Isolation Forest already found 57% of the anomalies, the Random Forest finds 63%, but its precision goes from 0.34 to 0.84. The labels teach the model to stop flagging normal beats, not to see more abnormal ones.

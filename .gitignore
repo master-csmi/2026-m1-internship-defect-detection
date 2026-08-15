@@ -30,5 +30,7 @@ docs/*.log
 docs/*.out
 docs/*.pdf
 docs/*.toc
+docs/*.fdb_latexmk
+docs/*.fls
 
 .pytest_cache
