@@ -5,9 +5,20 @@ M1 internship 2026: Detecting abnormal heartbeats in ECG signals.
 ## Setup
 
 ```bash
-pip install -e ".[notebook]"
+
 python -c "from m1_defect_anomaly_2026.data import download_mitbih; download_mitbih()"
 ```
+
+Notebooks 05 and 06 use PyTorch. Install the CPU build first, otherwise pip pulls the CUDA wheel and its ~2.5 GB of nvidia libraries:
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+pip install -e ".[notebook,deep]"
+```
+
+Without it the rest of the project still works and `tests/test_autoencoders.py` is skipped.
+
+
 
 ## Exploratory Data Analysis
 
@@ -55,15 +66,20 @@ measured on DS2, so no patient is ever in both. All the numbers below are on DS2
 
 | Method | Precision | Recall | F1 | ROC-AUC |
 |---|---|---|---|---|
-| Random Forest (supervised) | 0.837 | 0.633 | 0.721 | 0.948 |
-| XGBoost (supervised) | 0.686 | 0.677 | 0.681 | 0.940 |
-| Isolation Forest (unsupervised) | 0.343 | 0.566 | 0.427 | 0.836 |
-| Spectral features (statistical) | 0.297 | 0.502 | 0.373 | 0.773 |
-| CUSUM, k=0.5 (statistical) | 0.410 | 0.335 | 0.369 | 0.680 |
-| Z-score, 10s window (statistical) | 0.652 | 0.175 | 0.276 | 0.615 |
-| One-Class SVM (unsupervised) | 0.200 | 0.437 | 0.275 | 0.687 |
+| Random Forest | 0.837 | 0.633 | **0.721** | **0.948** |
+| XGBoost | 0.686 | 0.677 | 0.681 | 0.940 |
+| 1D CNN autoencoder | 0.349 | 0.669 | 0.459 | 0.839 |
+| Isolation Forest | 0.343 | 0.566 | 0.427 | 0.836 |
+| Spectral features | 0.297 | 0.502 | 0.373 | 0.773 |
+| CUSUM (k=0.5) | 0.410 | 0.335 | 0.369 | 0.680 |
+| LSTM autoencoder | 0.308 | 0.426 | 0.357 | 0.840 |
+| Z-score (10 s window) | 0.652 | 0.175 | 0.276 | 0.615 |
+| One-Class SVM | 0.200 | 0.437 | 0.275 | 0.687 |
 | Random baseline | 0.110 | 0.996 | 0.198 | 0.500 |
-| Z-score, 1s window (statistical) | 0.110 | 0.997 | 0.198 | 0.274 |
+| Z-score (1 s window) | 0.110 | 0.997 | 0.198 | 0.274 |
+| 1D CNN autoencoder (trained on all beats) | 0.147 | 0.205 | 0.171 | 0.708 |
+
+
 
 
 Main findings:

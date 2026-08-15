@@ -26,8 +26,18 @@ Thumbs.db
 .idea/
 
 docs/*.aux
+docs/*.bbl
+docs/*.bcf
+docs/*.blg
+docs/*.fdb_latexmk
+docs/*.fls
 docs/*.log
 docs/*.out
+docs/*.run.xml
+docs/*.toc
+docs/*.lof
+docs/*.lot
+docs/*.synctex.gz
 docs/*.pdf
 docs/*.toc
 docs/*.fdb_latexmk
