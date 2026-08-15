@@ -25,6 +25,8 @@ notebook = [
     "jupyterlab>=4.2.0",
 ]
 
+deep = ["torch>=2.2.0"]
+
 [build-system]
 requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
