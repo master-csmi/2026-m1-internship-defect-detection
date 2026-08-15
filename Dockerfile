@@ -11,7 +11,9 @@ WORKDIR /app
 COPY pyproject.toml README.md ./
 COPY src/ ./src/
 
-RUN pip install --no-cache-dir -e ".[notebook]"
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+RUN pip install --no-cache-dir -e ".[notebook,deep]"
 
 COPY tests/ ./tests/
 COPY notebooks/ ./notebooks/
