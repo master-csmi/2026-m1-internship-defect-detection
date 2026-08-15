@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import pandas as pd
 import torch
@@ -145,38 +147,61 @@ class Conv1dAutoencoder(nn.Module):
 
 # the LSTM walks along the window one time step after the other and keeps a memory of
 # what it has seen, so it can use the distance between two beats, not only their shape
-# the last memory state is squeezed into latent_dim numbers, then repeated at every time
-# step for the decoder to unroll the window again
+#
+# two things here are there to make the model trainable at all - the first version of this
+# class stayed stuck at a reconstruction error of ~0.95, which on a signal of variance 1 is
+# what you get by answering a flat line:
+#   - the encoder reads the window in BOTH directions. With a single direction the summary
+#     of the window is the memory state after 120 steps, and what happened at the start of
+#     the window has to survive all 120 of them.
+#   - the decoder is given sines and cosines of the position instead of a single 0 -> 1
+#     ramp. A ramp tells it where it is, but it still has to invent every oscillation of
+#     the ECG from scratch; with sines it only has to combine them.
 class LstmAutoencoder(nn.Module):
-    def __init__(self, hidden_size=32, latent_dim=8, num_layers=1):
+    def __init__(self, hidden_size=64, latent_dim=16, num_layers=1,
+                 bidirectional=True, clock_harmonics=8):
         super().__init__()
         self.hidden_size = int(hidden_size)
         self.latent_dim = int(latent_dim)
-        self.encoder = nn.LSTM(1, self.hidden_size, num_layers=num_layers, batch_first=True)
-        self.to_latent = nn.Linear(self.hidden_size, latent_dim)
-        self.from_latent = nn.Linear(latent_dim, self.hidden_size)
-        self.decoder = nn.LSTM(self.hidden_size+1, self.hidden_size,
-                               num_layers=num_layers, batch_first=True)
+        self.num_layers = int(num_layers)
+        self.bidirectional = bool(bidirectional)
+        self.clock_harmonics = int(clock_harmonics)
+
+        self.encoder = nn.LSTM(1, self.hidden_size, num_layers=self.num_layers,
+                               batch_first=True, bidirectional=self.bidirectional)
+        directions = 2 if self.bidirectional else 1
+        self.to_latent = nn.Linear(self.hidden_size * directions, self.latent_dim)
+        self.from_latent = nn.Linear(self.latent_dim, self.hidden_size)
+        self.clock_size = 2 * self.clock_harmonics
+        self.decoder = nn.LSTM(self.hidden_size + self.clock_size, self.hidden_size,
+                               num_layers=self.num_layers, batch_first=True)
         self.head = nn.Linear(self.hidden_size, 1)
 
     def encode(self, x):
         _, (hidden, _) = self.encoder(x.unsqueeze(-1))
-        return self.to_latent(hidden[-1])
+        # hidden is (layers * directions, batch, hidden_size), the last layer is at the end
+        if self.bidirectional:
+            summary = torch.cat([hidden[-2], hidden[-1]], dim=-1)
+        else:
+            summary = hidden[-1]
+        return self.to_latent(summary)
+
+    # sin(2 pi k t) and cos(2 pi k t) for k = 1 .. clock_harmonics, t going from 0 to 1
+    # across the window: a fixed set of waves the decoder can add up
+    def _clock(self, length, device, dtype):
+        t = torch.linspace(0.0, 1.0, length, device=device, dtype=dtype).view(length, 1)
+        k = torch.arange(1, self.clock_harmonics + 1, device=device, dtype=dtype).view(1, -1)
+        angle = (2.0 * math.pi) * k * t
+        return torch.cat([torch.sin(angle), torch.cos(angle)], dim=-1).unsqueeze(0)
 
     def decode(self, z, length):
-        seed = self.from_latent(z).unsqueeze(1).repeat(1, length, 1)
-        # without this the decoder gets an identical input at all 120 steps and cannot
-        # tell the start of the window from its end, so it collapses to a flat line
-        clock = torch.linspace(0, 1, length, device=z.device).view(1, length, 1)
-        out, _ = self.decoder(torch.cat([seed, clock.expand(z.shape[0], -1, -1)], dim=-1))
+        seed = self.from_latent(z).unsqueeze(1).expand(-1, length, -1)
+        clock = self._clock(length, z.device, z.dtype).expand(z.shape[0], -1, -1)
+        out, _ = self.decoder(torch.cat([seed, clock], dim=-1))
         return self.head(out).squeeze(-1)
 
     def forward(self, x):
         return self.decode(self.encode(x), x.shape[1])
-
-
-
-
 
 
 
@@ -192,7 +217,7 @@ def _to_tensor(X):
 # the validation loss is measured on normal beats of held-out records, and the weights of
 # the best epoch are the ones we keep
 def train_autoencoder(model, X_train, X_val=None, epochs=30, batch_size=256, lr=1e-3,
-                      patience=5, seed=42, verbose=True):
+                      patience=5, seed=42, verbose=True, grad_clip=1.0):
     set_seed(seed)
     loader = DataLoader(TensorDataset(_to_tensor(X_train)), batch_size=batch_size, shuffle=True)
     optimiser = torch.optim.Adam(model.parameters(), lr=lr)
@@ -208,6 +233,10 @@ def train_autoencoder(model, X_train, X_val=None, epochs=30, batch_size=256, lr=
             optimiser.zero_grad()
             loss = loss_fn(model(batch), batch)
             loss.backward()
+            # an LSTM can produce one huge gradient and destroy the weights in a single
+            # step - this caps the size of the step, and costs nothing for the CNN
+            if grad_clip:
+                nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
             optimiser.step()
             total += float(loss.item()) * len(batch)
             seen += len(batch)
@@ -240,6 +269,14 @@ def train_autoencoder(model, X_train, X_val=None, epochs=30, batch_size=256, lr=
     if best_state is not None:
         model.load_state_dict(best_state)
     return history
+
+
+# the error of the laziest possible model: always answer the average training window
+# any autoencoder must beat this, otherwise its scores mean nothing
+def mean_window_baseline(X_train, X_eval=None):
+    X_train = np.asarray(X_train, dtype=np.float32)
+    X_eval = X_train if X_eval is None else np.asarray(X_eval, dtype=np.float32)
+    return float(((X_eval - X_train.mean(axis=0)) ** 2).mean())
 
 
 @torch.no_grad()
@@ -322,7 +359,6 @@ def error_curve(signal_length, starts, per_sample_error, step=1):
     count = np.bincount(index[inside], minlength=signal_length)
     return np.divide(total, count, out=np.full(signal_length, np.nan, dtype=float),
                      where=count > 0)
-
 
 
 

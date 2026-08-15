@@ -12,7 +12,8 @@ from m1_defect_anomaly_2026.autoencoders import (Conv1dAutoencoder, LstmAutoenco
                                                  train_autoencoder, reconstruct,
                                                  squared_error, reconstruction_error,
                                                  percentile_threshold, threshold_sweep,
-                                                 error_curve, set_seed)
+                                                 error_curve, set_seed,
+                                                 mean_window_baseline)
 import torch
 
 
@@ -121,6 +122,23 @@ def test_lstm_autoencoder_has_a_bottleneck():
     assert model.encode(torch.randn(3, 120)).shape == (3, 4)
 
 
+def test_lstm_autoencoder_works_in_one_direction_too():
+    model = LstmAutoencoder(hidden_size=8, latent_dim=4, bidirectional=False)
+    x = torch.randn(4, 60)
+    assert model.encode(x).shape == (4, 4)
+    assert model(x).shape == x.shape
+
+
+def test_lstm_decoder_does_not_give_a_flat_line():
+    # the decoder receives the same latent at every time step, so without its position
+    # signal the only thing it can answer is one constant repeated - which is exactly how
+    # the first version of this model failed
+    set_seed(0)
+    model = LstmAutoencoder(hidden_size=16, latent_dim=4)
+    out = model(torch.randn(2, 60)).detach().numpy()
+    assert out.std(axis=1).min() > 1e-6
+
+
 # ------------------------------------------------------------------ training and scoring
 
 
@@ -129,6 +147,46 @@ def test_training_lowers_the_loss():
     X = beat_windows(make_record(n_beats=60))
     model = Conv1dAutoencoder(input_length=X.shape[1], latent_dim=8)
     history = train_autoencoder(model, X, epochs=8, batch_size=16, verbose=False)
+    assert history["train"][-1] < history["train"][0]
+
+
+# ---- regression test ----
+# the LSTM autoencoder used to train down to a reconstruction error of ~0.95 on a signal of
+# variance 1, which is what answering a flat line gives. It looked like a loss, it was the
+# model learning nothing, and every score built on it was noise. Here it has to clearly
+# beat the flat answer on an easy signal.
+def _sine_windows(n=512, length=60, seed=0):
+    rng = np.random.default_rng(seed)
+    t = np.linspace(0.0, 2 * np.pi, length)
+    phase = rng.uniform(0.0, 2 * np.pi, size=n)[:, None]
+    amplitude = rng.uniform(0.5, 1.5, size=n)[:, None]
+    return (amplitude * np.sin(t[None, :] + phase)).astype(np.float32)
+
+
+def test_lstm_autoencoder_beats_the_flat_answer():
+    set_seed(0)
+    X = _sine_windows()
+    model = LstmAutoencoder(hidden_size=32, latent_dim=4)
+    train_autoencoder(model, X, epochs=150, batch_size=64, lr=3e-3, verbose=False)
+
+    baseline = mean_window_baseline(X)
+    learned = float(reconstruction_error(model, X).mean())
+    assert learned < 0.5 * baseline
+
+
+def test_mean_window_baseline_is_the_error_of_the_average_window():
+    X = np.stack([np.zeros(10), np.full(10, 2.0)]).astype(np.float32)
+    # the average window is 1 everywhere, so every sample is off by 1
+    assert np.isclose(mean_window_baseline(X), 1.0)
+
+
+def test_training_accepts_a_gradient_clip():
+    set_seed(0)
+    X = beat_windows(make_record(n_beats=60))
+    model = Conv1dAutoencoder(input_length=X.shape[1], latent_dim=8)
+    history = train_autoencoder(model, X, epochs=8, batch_size=16, verbose=False,
+                                grad_clip=0.5)
+    assert np.isfinite(history["train"]).all()
     assert history["train"][-1] < history["train"][0]
 
 
