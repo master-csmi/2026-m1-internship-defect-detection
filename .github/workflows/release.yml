@@ -1,0 +1,77 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    container: texlive/texlive:latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compile report document
+        run: |
+          cd docs
+          pdflatex -interaction=nonstopmode report.tex
+          biber report
+          pdflatex -interaction=nonstopmode report.tex
+          pdflatex -interaction=nonstopmode report.tex
+
+      - name: Compile presentation document
+        if: hashFiles('docs/presentation.tex') != ''
+        run: |
+          cd docs
+          pdflatex -interaction=nonstopmode presentation.tex
+          biber presentation
+          pdflatex -interaction=nonstopmode presentation.tex
+          pdflatex -interaction=nonstopmode presentation.tex
+
+      - name: Rename to the deposit names
+        run: |
+          cd docs
+          cp report.pdf Ammar-Mary.pdf
+          if [ -f presentation.pdf ]; then cp presentation.pdf Ammar-Mary-slides.pdf; fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1-defect-anomaly-docs
+          if-no-files-found: warn
+          path: |
+            docs/Ammar-Mary.pdf
+            docs/Ammar-Mary-slides.pdf
+
+      - name: summary
+        run: |
+          echo "Build finished." >> $GITHUB_STEP_SUMMARY
+          echo "Artifact: m1-defect-anomaly-docs" >> $GITHUB_STEP_SUMMARY
+          echo "Report: Ammar-Mary.pdf" >> $GITHUB_STEP_SUMMARY
+          echo "Slides: Ammar-Mary-slides.pdf (only if presentation.tex exists)" >> $GITHUB_STEP_SUMMARY
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-24.04
+    needs: build
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: m1-defect-anomaly-docs
+          path: downloaded_artifacts
+
+      - name: Release artifact
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            downloaded_artifacts/Ammar-Mary.pdf
+            downloaded_artifacts/Ammar-Mary-slides.pdf
+          prerelease: false
+          generate_release_notes: true
