@@ -2364,17 +2364,65 @@
     <bcf:datasource type="file" datatype="bibtex" glob="false">references.bib</bcf:datasource>
   </bcf:bibdata>
   <bcf:section number="0">
-    <bcf:citekey order="1" intorder="1">taskforce1996hrv</bcf:citekey>
-    <bcf:citekey order="2" intorder="1">luz2016survey</bcf:citekey>
-    <bcf:citekey order="3" intorder="1">moody2001mitbih</bcf:citekey>
-    <bcf:citekey order="4" intorder="1">randall2011bearing</bcf:citekey>
-    <bcf:citekey order="5" intorder="1">lei2018review</bcf:citekey>
-    <bcf:citekey order="6" intorder="1">chandola2009survey</bcf:citekey>
-    <bcf:citekey order="7" intorder="1">ruff2021unifying</bcf:citekey>
-    <bcf:citekey order="8" intorder="1">goldberger2000physionet</bcf:citekey>
-    <bcf:citekey order="9" intorder="1">aami2012ec57</bcf:citekey>
-    <bcf:citekey order="10" intorder="1">dechazal2004</bcf:citekey>
-    <bcf:citekey order="11" intorder="1">csmiguide</bcf:citekey>
+    <bcf:citekey order="1" intorder="1">moody2001mitbih</bcf:citekey>
+    <bcf:citekey order="2" intorder="1">dechazal2004</bcf:citekey>
+    <bcf:citekey order="3" intorder="1">taskforce1996hrv</bcf:citekey>
+    <bcf:citekey order="4" intorder="1">luz2016survey</bcf:citekey>
+    <bcf:citekey order="5" intorder="1">moody2001mitbih</bcf:citekey>
+    <bcf:citekey order="6" intorder="1">randall2011bearing</bcf:citekey>
+    <bcf:citekey order="7" intorder="1">lei2018review</bcf:citekey>
+    <bcf:citekey order="8" intorder="1">chandola2009survey</bcf:citekey>
+    <bcf:citekey order="9" intorder="1">ruff2021unifying</bcf:citekey>
+    <bcf:citekey order="10" intorder="1">goldberger2000physionet</bcf:citekey>
+    <bcf:citekey order="11" intorder="1">aami2012ec57</bcf:citekey>
+    <bcf:citekey order="12" intorder="1">dechazal2004</bcf:citekey>
+    <bcf:citekey order="13" intorder="1">csmiguide</bcf:citekey>
+    <bcf:citekey order="14" intorder="1">wilson2017goodpractices</bcf:citekey>
+    <bcf:citekey order="14" intorder="2">sandve2013reproducible</bcf:citekey>
+    <bcf:citekey order="15" intorder="1">ammar2026repo</bcf:citekey>
+    <bcf:citekey order="16" intorder="1">dechazal2004</bcf:citekey>
+    <bcf:citekey order="17" intorder="1">moody2001mitbih</bcf:citekey>
+    <bcf:citekey order="18" intorder="1">goldberger2000physionet</bcf:citekey>
+    <bcf:citekey order="19" intorder="1">aami2012ec57</bcf:citekey>
+    <bcf:citekey order="20" intorder="1">harris2020numpy</bcf:citekey>
+    <bcf:citekey order="20" intorder="2">virtanen2020scipy</bcf:citekey>
+    <bcf:citekey order="20" intorder="3">mckinney2010pandas</bcf:citekey>
+    <bcf:citekey order="20" intorder="4">hunter2007matplotlib</bcf:citekey>
+    <bcf:citekey order="21" intorder="1">wfdbpython</bcf:citekey>
+    <bcf:citekey order="22" intorder="1">pedregosa2011sklearn</bcf:citekey>
+    <bcf:citekey order="23" intorder="1">chen2016xgboost</bcf:citekey>
+    <bcf:citekey order="24" intorder="1">paszke2019pytorch</bcf:citekey>
+    <bcf:citekey order="25" intorder="1">merkel2014docker</bcf:citekey>
+    <bcf:citekey order="26" intorder="1">csmiguide</bcf:citekey>
+    <bcf:citekey order="27" intorder="1">moody2001mitbih</bcf:citekey>
+    <bcf:citekey order="28" intorder="1">aami2012ec57</bcf:citekey>
+    <bcf:citekey order="29" intorder="1">dechazal2004</bcf:citekey>
+    <bcf:citekey order="30" intorder="1">pan1985qrs</bcf:citekey>
+    <bcf:citekey order="31" intorder="1">dechazal2004</bcf:citekey>
+    <bcf:citekey order="31" intorder="2">luz2016survey</bcf:citekey>
+    <bcf:citekey order="32" intorder="1">kachuee2018</bcf:citekey>
+    <bcf:citekey order="33" intorder="1">chandola2009survey</bcf:citekey>
+    <bcf:citekey order="33" intorder="2">ruff2021unifying</bcf:citekey>
+    <bcf:citekey order="34" intorder="1">luz2016survey</bcf:citekey>
+    <bcf:citekey order="35" intorder="1">moody2001mitbih</bcf:citekey>
+    <bcf:citekey order="36" intorder="1">goldberger2000physionet</bcf:citekey>
+    <bcf:citekey order="37" intorder="1">aami2012ec57</bcf:citekey>
+    <bcf:citekey order="38" intorder="1">aami2012ec57</bcf:citekey>
+    <bcf:citekey order="38" intorder="2">dechazal2004</bcf:citekey>
+    <bcf:citekey order="39" intorder="1">dechazal2004</bcf:citekey>
+    <bcf:citekey order="40" intorder="1">luz2016survey</bcf:citekey>
+    <bcf:citekey order="41" intorder="1">lundberg2017shap</bcf:citekey>
+    <bcf:citekey order="42" intorder="1">hinton2006reducing</bcf:citekey>
+    <bcf:citekey order="43" intorder="1">sakurada2014autoencoder</bcf:citekey>
+    <bcf:citekey order="44" intorder="1">dechazal2004</bcf:citekey>
+    <bcf:citekey order="45" intorder="1">dechazal2004</bcf:citekey>
+    <bcf:citekey order="46" intorder="1">luz2016survey</bcf:citekey>
+    <bcf:citekey order="47" intorder="1">luz2016survey</bcf:citekey>
+    <bcf:citekey order="48" intorder="1">csmitools</bcf:citekey>
+    <bcf:citekey order="49" intorder="1">anthropic_claude</bcf:citekey>
+    <bcf:citekey order="50" intorder="1">openai_chatgpt</bcf:citekey>
+    <bcf:citekey order="51" intorder="1">google_gemini</bcf:citekey>
+    <bcf:citekey order="52" intorder="1">ammar2026repo</bcf:citekey>
   </bcf:section>
   <!-- SORTING TEMPLATES -->
   <bcf:sortingtemplate name="nyt">
@@ -2406,4 +2454,13 @@
     </bcf:sort>
   </bcf:sortingtemplate>
   <!-- DATALISTS -->
+  <bcf:datalist section="0"
+                name="nyt/global//global/global"
+                type="entry"
+                sortingtemplatename="nyt"
+                sortingnamekeytemplatename="global"
+                labelprefix=""
+                uniquenametemplatename="global"
+                labelalphanametemplatename="global">
+  </bcf:datalist>
 </bcf:controlfile>

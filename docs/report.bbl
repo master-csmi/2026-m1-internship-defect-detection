@@ -19,6 +19,29 @@
 
 \refsection{0}
   \datalist[entry]{nyt/global//global/global}
+    \entry{ammar2026repo}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=071001bae4e9df5ed5be9ce3d2fcb9f8}{%
+           family={Ammar},
+           familyi={A\bibinitperiod},
+           given={Mary},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{071001bae4e9df5ed5be9ce3d2fcb9f8}
+      \strng{fullhash}{071001bae4e9df5ed5be9ce3d2fcb9f8}
+      \strng{bibnamehash}{071001bae4e9df5ed5be9ce3d2fcb9f8}
+      \strng{authorbibnamehash}{071001bae4e9df5ed5be9ce3d2fcb9f8}
+      \strng{authornamehash}{071001bae4e9df5ed5be9ce3d2fcb9f8}
+      \strng{authorfullhash}{071001bae4e9df5ed5be9ce3d2fcb9f8}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{\url{https://github.com/master-csmi/2026-m1-internship-defect-detection}}
+      \field{note}{Version 0.1.0, container image published on \texttt{ghcr.io}}
+      \field{title}{{m1\_defect\_anomaly\_2026}: Anomaly Detection on Time-Series Data}
+      \field{year}{2026}
+    \endentry
     \entry{aami2012ec57}{manual}{}
       \list{location}{1}{%
         {Arlington, VA, USA}%
@@ -31,6 +54,32 @@
       \field{labeltitlesource}{title}
       \field{title}{{ANSI/AAMI EC57:2012} --- Testing and Reporting Performance Results of Cardiac Rhythm and {ST} Segment Measurement Algorithms}
       \field{year}{2012}
+    \endentry
+    \entry{anthropic_claude}{software}{}
+      \name{author}{1}{}{%
+        {{hash=f431db65cea024a5f19eab835afefee2}{%
+           family={Anthropic},
+           familyi={A\bibinitperiod}}}%
+      }
+      \strng{namehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{fullhash}{f431db65cea024a5f19eab835afefee2}
+      \strng{bibnamehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authorbibnamehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authornamehash}{f431db65cea024a5f19eab835afefee2}
+      \strng{authorfullhash}{f431db65cea024a5f19eab835afefee2}
+      \field{sortinit}{A}
+      \field{sortinithash}{2f401846e2029bad6b3ecc16d50031e2}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Large language model}
+      \field{title}{Claude}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://claude.ai
+      \endverb
+      \verb{url}
+      \verb https://claude.ai
+      \endverb
     \endentry
     \entry{chandola2009survey}{article}{}
       \name{author}{3}{}{%
@@ -112,6 +161,38 @@
       \verb 10.1109/TBME.2004.827359
       \endverb
     \endentry
+    \entry{chen2016xgboost}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{hash=48461ccdf50ba5a54e29a354aa734c0b}{%
+           family={Chen},
+           familyi={C\bibinitperiod},
+           given={Tianqi},
+           giveni={T\bibinitperiod}}}%
+        {{hash=c9ab8ac486d7f85ac914b1a8e51e512b}{%
+           family={Guestrin},
+           familyi={G\bibinitperiod},
+           given={Carlos},
+           giveni={C\bibinitperiod}}}%
+      }
+      \strng{namehash}{f79ceb030bcf791e5521f87ac6ada03b}
+      \strng{fullhash}{f79ceb030bcf791e5521f87ac6ada03b}
+      \strng{bibnamehash}{f79ceb030bcf791e5521f87ac6ada03b}
+      \strng{authorbibnamehash}{f79ceb030bcf791e5521f87ac6ada03b}
+      \strng{authornamehash}{f79ceb030bcf791e5521f87ac6ada03b}
+      \strng{authorfullhash}{f79ceb030bcf791e5521f87ac6ada03b}
+      \field{sortinit}{C}
+      \field{sortinithash}{4d103a86280481745c9c897c925753c0}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining}
+      \field{title}{{XGBoost}: A Scalable Tree Boosting System}
+      \field{year}{2016}
+      \field{pages}{785\bibrangedash 794}
+      \range{pages}{10}
+      \verb{doi}
+      \verb 10.1145/2939672.2939785
+      \endverb
+    \endentry
     \entry{goldberger2000physionet}{article}{}
       \name{author}{10}{}{%
         {{hash=c99be12ffae540b5ba4cb3a23ee3ec0a}{%
@@ -186,6 +267,190 @@
       \verb 10.1161/01.CIR.101.23.e215
       \endverb
     \endentry
+    \entry{google_gemini}{software}{}
+      \name{author}{1}{}{%
+        {{hash=8b36e9207c24c76e6719268e49201d94}{%
+           family={Google},
+           familyi={G\bibinitperiod}}}%
+      }
+      \strng{namehash}{8b36e9207c24c76e6719268e49201d94}
+      \strng{fullhash}{8b36e9207c24c76e6719268e49201d94}
+      \strng{bibnamehash}{8b36e9207c24c76e6719268e49201d94}
+      \strng{authorbibnamehash}{8b36e9207c24c76e6719268e49201d94}
+      \strng{authornamehash}{8b36e9207c24c76e6719268e49201d94}
+      \strng{authorfullhash}{8b36e9207c24c76e6719268e49201d94}
+      \field{sortinit}{G}
+      \field{sortinithash}{32d67eca0634bf53703493fb1090a2e8}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Large language model}
+      \field{title}{Gemini}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://gemini.google.com
+      \endverb
+      \verb{url}
+      \verb https://gemini.google.com
+      \endverb
+    \endentry
+    \entry{harris2020numpy}{article}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{6}{}{%
+        {{hash=db2b4761cc46be347b418e68660c9554}{%
+           family={Harris},
+           familyi={H\bibinitperiod},
+           given={Charles\bibnamedelima R.},
+           giveni={C\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+        {{hash=b053969d2c6a9ec8689980fb6463cd56}{%
+           family={Millman},
+           familyi={M\bibinitperiod},
+           given={K.\bibnamedelimi Jarrod},
+           giveni={K\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=9a5a65a789013a8d1e8035ec28df9b6e}{%
+           family={Walt},
+           familyi={W\bibinitperiod},
+           given={Stéfan\bibnamedelima J.},
+           giveni={S\bibinitperiod\bibinitdelim J\bibinitperiod},
+           prefix={van\bibnamedelima der},
+           prefixi={v\bibinitperiod\bibinitdelim d\bibinitperiod}}}%
+        {{hash=646fbfe08374cc41c2f9bd971d8c4725}{%
+           family={Gommers},
+           familyi={G\bibinitperiod},
+           given={Ralf},
+           giveni={R\bibinitperiod}}}%
+        {{hash=18703a2bb6a62484483c193a212da2f8}{%
+           family={Virtanen},
+           familyi={V\bibinitperiod},
+           given={Pauli},
+           giveni={P\bibinitperiod}}}%
+        {{hash=9fd9ed8466bbb96364ae008f2a665e6e}{%
+           family={Cournapeau},
+           familyi={C\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{754b3dec5e203c19b9a5798bbb902222}
+      \strng{fullhash}{b411efaef11accdd6e2b67e2c5d07969}
+      \strng{bibnamehash}{b411efaef11accdd6e2b67e2c5d07969}
+      \strng{authorbibnamehash}{b411efaef11accdd6e2b67e2c5d07969}
+      \strng{authornamehash}{754b3dec5e203c19b9a5798bbb902222}
+      \strng{authorfullhash}{b411efaef11accdd6e2b67e2c5d07969}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Nature}
+      \field{number}{7825}
+      \field{title}{Array Programming with {NumPy}}
+      \field{volume}{585}
+      \field{year}{2020}
+      \field{pages}{357\bibrangedash 362}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1038/s41586-020-2649-2
+      \endverb
+    \endentry
+    \entry{hinton2006reducing}{article}{}
+      \name{author}{2}{}{%
+        {{hash=813bd95fe553e6079cd53a567b238287}{%
+           family={Hinton},
+           familyi={H\bibinitperiod},
+           given={Geoffrey\bibnamedelima E.},
+           giveni={G\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=1eedb5d67ab6771125689502fd082a35}{%
+           family={Salakhutdinov},
+           familyi={S\bibinitperiod},
+           given={Ruslan\bibnamedelima R.},
+           giveni={R\bibinitperiod\bibinitdelim R\bibinitperiod}}}%
+      }
+      \strng{namehash}{88bbb6297d8ca353791ca7e862805428}
+      \strng{fullhash}{88bbb6297d8ca353791ca7e862805428}
+      \strng{bibnamehash}{88bbb6297d8ca353791ca7e862805428}
+      \strng{authorbibnamehash}{88bbb6297d8ca353791ca7e862805428}
+      \strng{authornamehash}{88bbb6297d8ca353791ca7e862805428}
+      \strng{authorfullhash}{88bbb6297d8ca353791ca7e862805428}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Science}
+      \field{number}{5786}
+      \field{title}{Reducing the Dimensionality of Data with Neural Networks}
+      \field{volume}{313}
+      \field{year}{2006}
+      \field{pages}{504\bibrangedash 507}
+      \range{pages}{4}
+      \verb{doi}
+      \verb 10.1126/science.1127647
+      \endverb
+    \endentry
+    \entry{hunter2007matplotlib}{article}{}
+      \name{author}{1}{}{%
+        {{hash=a2f53dcc6bb05a06b8ad94176f80fe26}{%
+           family={Hunter},
+           familyi={H\bibinitperiod},
+           given={John\bibnamedelima D.},
+           giveni={J\bibinitperiod\bibinitdelim D\bibinitperiod}}}%
+      }
+      \strng{namehash}{a2f53dcc6bb05a06b8ad94176f80fe26}
+      \strng{fullhash}{a2f53dcc6bb05a06b8ad94176f80fe26}
+      \strng{bibnamehash}{a2f53dcc6bb05a06b8ad94176f80fe26}
+      \strng{authorbibnamehash}{a2f53dcc6bb05a06b8ad94176f80fe26}
+      \strng{authornamehash}{a2f53dcc6bb05a06b8ad94176f80fe26}
+      \strng{authorfullhash}{a2f53dcc6bb05a06b8ad94176f80fe26}
+      \field{sortinit}{H}
+      \field{sortinithash}{23a3aa7c24e56cfa16945d55545109b5}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Computing in Science \& Engineering}
+      \field{number}{3}
+      \field{title}{Matplotlib: A {2D} Graphics Environment}
+      \field{volume}{9}
+      \field{year}{2007}
+      \field{pages}{90\bibrangedash 95}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1109/MCSE.2007.55
+      \endverb
+    \endentry
+    \entry{kachuee2018}{inproceedings}{}
+      \name{author}{3}{}{%
+        {{hash=c211d90c5e1b96132559cc6ae5c8e3dd}{%
+           family={Kachuee},
+           familyi={K\bibinitperiod},
+           given={Mohammad},
+           giveni={M\bibinitperiod}}}%
+        {{hash=2ca0d7261f28a1be768da6cc51e3d946}{%
+           family={Fazeli},
+           familyi={F\bibinitperiod},
+           given={Shayan},
+           giveni={S\bibinitperiod}}}%
+        {{hash=a0b1d3e35bc4d05fb1a34711a4ebcad8}{%
+           family={Sarrafzadeh},
+           familyi={S\bibinitperiod},
+           given={Majid},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{cb14d106ae25eb2fadd2ac4bface76b9}
+      \strng{fullhash}{cb14d106ae25eb2fadd2ac4bface76b9}
+      \strng{bibnamehash}{cb14d106ae25eb2fadd2ac4bface76b9}
+      \strng{authorbibnamehash}{cb14d106ae25eb2fadd2ac4bface76b9}
+      \strng{authornamehash}{cb14d106ae25eb2fadd2ac4bface76b9}
+      \strng{authorfullhash}{cb14d106ae25eb2fadd2ac4bface76b9}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{IEEE International Conference on Healthcare Informatics (ICHI)}
+      \field{title}{{ECG} Heartbeat Classification: A Deep Transferable Representation}
+      \field{year}{2018}
+      \field{pages}{443\bibrangedash 444}
+      \range{pages}{2}
+      \verb{doi}
+      \verb 10.1109/ICHI.2018.00092
+      \endverb
+    \endentry
     \entry{lei2018review}{article}{}
       \name{author}{6}{}{%
         {{hash=1a3febc90d8f073e62656f05ef6ec1b8}{%
@@ -239,6 +504,35 @@
       \verb 10.1016/j.ymssp.2017.11.016
       \endverb
     \endentry
+    \entry{lundberg2017shap}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{hash=2a1075150e1e1dad8127b019f7ca9031}{%
+           family={Lundberg},
+           familyi={L\bibinitperiod},
+           given={Scott\bibnamedelima M.},
+           giveni={S\bibinitperiod\bibinitdelim M\bibinitperiod}}}%
+        {{hash=ee964079d93879aaef2382a5fff343d3}{%
+           family={Lee},
+           familyi={L\bibinitperiod},
+           given={Su-In},
+           giveni={S\bibinithyphendelim I\bibinitperiod}}}%
+      }
+      \strng{namehash}{9cd6e49767b1dfa9f5df9a46216a8739}
+      \strng{fullhash}{9cd6e49767b1dfa9f5df9a46216a8739}
+      \strng{bibnamehash}{9cd6e49767b1dfa9f5df9a46216a8739}
+      \strng{authorbibnamehash}{9cd6e49767b1dfa9f5df9a46216a8739}
+      \strng{authornamehash}{9cd6e49767b1dfa9f5df9a46216a8739}
+      \strng{authorfullhash}{9cd6e49767b1dfa9f5df9a46216a8739}
+      \field{sortinit}{L}
+      \field{sortinithash}{7c47d417cecb1f4bd38d1825c427a61a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Advances in Neural Information Processing Systems 30 (NeurIPS)}
+      \field{title}{A Unified Approach to Interpreting Model Predictions}
+      \field{year}{2017}
+      \field{pages}{4765\bibrangedash 4774}
+      \range{pages}{10}
+    \endentry
     \entry{luz2016survey}{article}{}
       \name{author}{4}{}{%
         {{hash=ae119131a56600b8db3af40e082e36d5}{%
@@ -282,6 +576,35 @@
       \verb 10.1016/j.cmpb.2015.12.008
       \endverb
     \endentry
+    \entry{csmitools}{misc}{}
+      \name{author}{1}{}{%
+        {{hash=985390664a1fce6d2a6fae9dc7aeac7b}{%
+           family={{Master CSMI}},
+           familyi={M\bibinitperiod}}}%
+      }
+      \list{organization}{1}{%
+        {Université de Strasbourg, Cemosis}%
+      }
+      \strng{namehash}{985390664a1fce6d2a6fae9dc7aeac7b}
+      \strng{fullhash}{985390664a1fce6d2a6fae9dc7aeac7b}
+      \strng{bibnamehash}{985390664a1fce6d2a6fae9dc7aeac7b}
+      \strng{authorbibnamehash}{985390664a1fce6d2a6fae9dc7aeac7b}
+      \strng{authornamehash}{985390664a1fce6d2a6fae9dc7aeac7b}
+      \strng{authorfullhash}{985390664a1fce6d2a6fae9dc7aeac7b}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Accessed 16 August 2026}
+      \field{title}{Outils informatiques et politique d'utilisation de l'IA}
+      \field{year}{2025}
+      \verb{urlraw}
+      \verb https://csmi.cemosis.fr/fr/csmi/outils.html
+      \endverb
+      \verb{url}
+      \verb https://csmi.cemosis.fr/fr/csmi/outils.html
+      \endverb
+    \endentry
     \entry{csmiguide}{misc}{}
       \name{author}{1}{}{%
         {{hash=8d3e075936d57d7dade5293f214b3a3f}{%
@@ -302,6 +625,59 @@
       \field{note}{Accessed: 2026-08-13}
       \field{title}{Guide du rapport de stage}
       \field{year}{2025}
+    \endentry
+    \entry{mckinney2010pandas}{inproceedings}{}
+      \name{author}{1}{}{%
+        {{hash=27ca77940a5e8c07c5d89d0f3fb11d75}{%
+           family={McKinney},
+           familyi={M\bibinitperiod},
+           given={Wes},
+           giveni={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{27ca77940a5e8c07c5d89d0f3fb11d75}
+      \strng{fullhash}{27ca77940a5e8c07c5d89d0f3fb11d75}
+      \strng{bibnamehash}{27ca77940a5e8c07c5d89d0f3fb11d75}
+      \strng{authorbibnamehash}{27ca77940a5e8c07c5d89d0f3fb11d75}
+      \strng{authornamehash}{27ca77940a5e8c07c5d89d0f3fb11d75}
+      \strng{authorfullhash}{27ca77940a5e8c07c5d89d0f3fb11d75}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the 9th Python in Science Conference (SciPy)}
+      \field{title}{Data Structures for Statistical Computing in {Python}}
+      \field{year}{2010}
+      \field{pages}{56\bibrangedash 61}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.25080/Majora-92bf1922-00a
+      \endverb
+    \endentry
+    \entry{merkel2014docker}{article}{}
+      \name{author}{1}{}{%
+        {{hash=10d7200e2bfcc5a34efbee3b80c90f13}{%
+           family={Merkel},
+           familyi={M\bibinitperiod},
+           given={Dirk},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{10d7200e2bfcc5a34efbee3b80c90f13}
+      \strng{fullhash}{10d7200e2bfcc5a34efbee3b80c90f13}
+      \strng{bibnamehash}{10d7200e2bfcc5a34efbee3b80c90f13}
+      \strng{authorbibnamehash}{10d7200e2bfcc5a34efbee3b80c90f13}
+      \strng{authornamehash}{10d7200e2bfcc5a34efbee3b80c90f13}
+      \strng{authorfullhash}{10d7200e2bfcc5a34efbee3b80c90f13}
+      \field{sortinit}{M}
+      \field{sortinithash}{4625c616857f13d17ce56f7d4f97d451}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Linux Journal}
+      \field{number}{239}
+      \field{title}{Docker: Lightweight {Linux} Containers for Consistent Development and Deployment}
+      \field{volume}{2014}
+      \field{year}{2014}
+      \field{pages}{2}
+      \range{pages}{1}
     \endentry
     \entry{moody2001mitbih}{article}{}
       \name{author}{2}{}{%
@@ -336,6 +712,179 @@
       \verb{doi}
       \verb 10.1109/51.932724
       \endverb
+    \endentry
+    \entry{openai_chatgpt}{software}{}
+      \name{author}{1}{}{%
+        {{hash=0523b13262b12c215d8009938f5c14f1}{%
+           family={OpenAI},
+           familyi={O\bibinitperiod}}}%
+      }
+      \strng{namehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{fullhash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{bibnamehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authorbibnamehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authornamehash}{0523b13262b12c215d8009938f5c14f1}
+      \strng{authorfullhash}{0523b13262b12c215d8009938f5c14f1}
+      \field{sortinit}{O}
+      \field{sortinithash}{2cd7140a07aea5341f9e2771efe90aae}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Large language model}
+      \field{title}{ChatGPT}
+      \field{year}{2026}
+      \verb{urlraw}
+      \verb https://chat.openai.com
+      \endverb
+      \verb{url}
+      \verb https://chat.openai.com
+      \endverb
+    \endentry
+    \entry{pan1985qrs}{article}{}
+      \name{author}{2}{}{%
+        {{hash=ccdc3e3d241b1ce26d7c7d2405695bca}{%
+           family={Pan},
+           familyi={P\bibinitperiod},
+           given={Jiapu},
+           giveni={J\bibinitperiod}}}%
+        {{hash=eb83740709bd91915efe2912ce4ea048}{%
+           family={Tompkins},
+           familyi={T\bibinitperiod},
+           given={Willis\bibnamedelima J.},
+           giveni={W\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+      }
+      \strng{namehash}{5e252c476d27bcdedcda3919fec475d6}
+      \strng{fullhash}{5e252c476d27bcdedcda3919fec475d6}
+      \strng{bibnamehash}{5e252c476d27bcdedcda3919fec475d6}
+      \strng{authorbibnamehash}{5e252c476d27bcdedcda3919fec475d6}
+      \strng{authornamehash}{5e252c476d27bcdedcda3919fec475d6}
+      \strng{authorfullhash}{5e252c476d27bcdedcda3919fec475d6}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{IEEE Transactions on Biomedical Engineering}
+      \field{number}{3}
+      \field{title}{A Real-Time {QRS} Detection Algorithm}
+      \field{volume}{BME-32}
+      \field{year}{1985}
+      \field{pages}{230\bibrangedash 236}
+      \range{pages}{7}
+      \verb{doi}
+      \verb 10.1109/TBME.1985.325532
+      \endverb
+    \endentry
+    \entry{paszke2019pytorch}{inproceedings}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{7}{}{%
+        {{hash=56bf0b340039cf8594436a624ff548a9}{%
+           family={Paszke},
+           familyi={P\bibinitperiod},
+           given={Adam},
+           giveni={A\bibinitperiod}}}%
+        {{hash=4ba5062e5919c814aceec188d54c01f2}{%
+           family={Gross},
+           familyi={G\bibinitperiod},
+           given={Sam},
+           giveni={S\bibinitperiod}}}%
+        {{hash=e5dfae4582081d649e3a0d5342050016}{%
+           family={Massa},
+           familyi={M\bibinitperiod},
+           given={Francisco},
+           giveni={F\bibinitperiod}}}%
+        {{hash=b5815e1692fa2d0c1f44eecf509bd7c4}{%
+           family={Lerer},
+           familyi={L\bibinitperiod},
+           given={Adam},
+           giveni={A\bibinitperiod}}}%
+        {{hash=b75383e6b48c8360c7a60031424c85cf}{%
+           family={Bradbury},
+           familyi={B\bibinitperiod},
+           given={James},
+           giveni={J\bibinitperiod}}}%
+        {{hash=f897ed422c34d95af2e22778dfc2607e}{%
+           family={Chanan},
+           familyi={C\bibinitperiod},
+           given={Gregory},
+           giveni={G\bibinitperiod}}}%
+        {{hash=046269e070246feb6f394141db80ed87}{%
+           family={Killeen},
+           familyi={K\bibinitperiod},
+           given={Trevor},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{724e74fc18651eb78eb82fbcd1d9dfb1}
+      \strng{fullhash}{174b8d266bc47fdfd8b90ad4c60997b0}
+      \strng{bibnamehash}{932e06a08a48d67a815ffec45fdea7aa}
+      \strng{authorbibnamehash}{932e06a08a48d67a815ffec45fdea7aa}
+      \strng{authornamehash}{724e74fc18651eb78eb82fbcd1d9dfb1}
+      \strng{authorfullhash}{174b8d266bc47fdfd8b90ad4c60997b0}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Advances in Neural Information Processing Systems 32 (NeurIPS)}
+      \field{title}{{PyTorch}: An Imperative Style, High-Performance Deep Learning Library}
+      \field{year}{2019}
+      \field{pages}{8024\bibrangedash 8035}
+      \range{pages}{12}
+    \endentry
+    \entry{pedregosa2011sklearn}{article}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{7}{}{%
+        {{hash=bab4e5caee2d67831e464ce575022b37}{%
+           family={Pedregosa},
+           familyi={P\bibinitperiod},
+           given={Fabian},
+           giveni={F\bibinitperiod}}}%
+        {{hash=cfa3239dded54488f9a82a5718d5b927}{%
+           family={Varoquaux},
+           familyi={V\bibinitperiod},
+           given={Gaël},
+           giveni={G\bibinitperiod}}}%
+        {{hash=12ebe424e1c87de156c57e8fa7683f46}{%
+           family={Gramfort},
+           familyi={G\bibinitperiod},
+           given={Alexandre},
+           giveni={A\bibinitperiod}}}%
+        {{hash=504ea1986689f1047a6f0beda2cb3822}{%
+           family={Michel},
+           familyi={M\bibinitperiod},
+           given={Vincent},
+           giveni={V\bibinitperiod}}}%
+        {{hash=0f3fc06fb9fcbb01b9cc0985eaf0a71c}{%
+           family={Thirion},
+           familyi={T\bibinitperiod},
+           given={Bertrand},
+           giveni={B\bibinitperiod}}}%
+        {{hash=721be0317527f44db425f7a97dcab15e}{%
+           family={Grisel},
+           familyi={G\bibinitperiod},
+           given={Olivier},
+           giveni={O\bibinitperiod}}}%
+        {{hash=d3b6c8582cea4e8b6576137b6a72cadc}{%
+           family={Blondel},
+           familyi={B\bibinitperiod},
+           given={Mathieu},
+           giveni={M\bibinitperiod}}}%
+      }
+      \strng{namehash}{9ec95d747bac3417f92265a9a44f8bb4}
+      \strng{fullhash}{f9ccbbbc4523051ff9821ecc29853728}
+      \strng{bibnamehash}{026cfc129149d06bacef9a7806267d69}
+      \strng{authorbibnamehash}{026cfc129149d06bacef9a7806267d69}
+      \strng{authornamehash}{9ec95d747bac3417f92265a9a44f8bb4}
+      \strng{authorfullhash}{f9ccbbbc4523051ff9821ecc29853728}
+      \field{sortinit}{P}
+      \field{sortinithash}{ff3bcf24f47321b42cb156c2cc8a8422}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Journal of Machine Learning Research}
+      \field{title}{Scikit-learn: Machine Learning in {Python}}
+      \field{volume}{12}
+      \field{year}{2011}
+      \field{pages}{2825\bibrangedash 2830}
+      \range{pages}{6}
     \endentry
     \entry{randall2011bearing}{article}{}
       \name{author}{2}{}{%
@@ -435,6 +984,82 @@
       \verb 10.1109/JPROC.2021.3052449
       \endverb
     \endentry
+    \entry{sakurada2014autoencoder}{inproceedings}{}
+      \name{author}{2}{}{%
+        {{hash=a1b0918bcbaee18ebd732374d128f0e5}{%
+           family={Sakurada},
+           familyi={S\bibinitperiod},
+           given={Mayu},
+           giveni={M\bibinitperiod}}}%
+        {{hash=7d4c45cd43acdd6bf6e730677317a5c8}{%
+           family={Yairi},
+           familyi={Y\bibinitperiod},
+           given={Takehisa},
+           giveni={T\bibinitperiod}}}%
+      }
+      \strng{namehash}{27f4fcf9d91a2bc2fac190dc7c72b800}
+      \strng{fullhash}{27f4fcf9d91a2bc2fac190dc7c72b800}
+      \strng{bibnamehash}{27f4fcf9d91a2bc2fac190dc7c72b800}
+      \strng{authorbibnamehash}{27f4fcf9d91a2bc2fac190dc7c72b800}
+      \strng{authornamehash}{27f4fcf9d91a2bc2fac190dc7c72b800}
+      \strng{authorfullhash}{27f4fcf9d91a2bc2fac190dc7c72b800}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{booktitle}{Proceedings of the MLSDA 2014 2nd Workshop on Machine Learning for Sensory Data Analysis}
+      \field{title}{Anomaly Detection Using Autoencoders with Nonlinear Dimensionality Reduction}
+      \field{year}{2014}
+      \field{pages}{4\bibrangedash 11}
+      \range{pages}{8}
+      \verb{doi}
+      \verb 10.1145/2689746.2689747
+      \endverb
+    \endentry
+    \entry{sandve2013reproducible}{article}{}
+      \name{author}{4}{}{%
+        {{hash=563f412962e47abb351da8376e8c7d0b}{%
+           family={Sandve},
+           familyi={S\bibinitperiod},
+           given={Geir\bibnamedelima Kjetil},
+           giveni={G\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+        {{hash=2727c13f5ad7e4c404f2553e4c15f567}{%
+           family={Nekrutenko},
+           familyi={N\bibinitperiod},
+           given={Anton},
+           giveni={A\bibinitperiod}}}%
+        {{hash=04e4b01cc527b681dc6aa9db38192f81}{%
+           family={Taylor},
+           familyi={T\bibinitperiod},
+           given={James},
+           giveni={J\bibinitperiod}}}%
+        {{hash=dbdcc74c913bb753e9ee433eba8b0bd1}{%
+           family={Hovig},
+           familyi={H\bibinitperiod},
+           given={Eivind},
+           giveni={E\bibinitperiod}}}%
+      }
+      \strng{namehash}{1b4f77f20ed642a30f346a44eb14e42a}
+      \strng{fullhash}{fcf1c4dd64b173c183ef6911c8af959e}
+      \strng{bibnamehash}{fcf1c4dd64b173c183ef6911c8af959e}
+      \strng{authorbibnamehash}{fcf1c4dd64b173c183ef6911c8af959e}
+      \strng{authornamehash}{1b4f77f20ed642a30f346a44eb14e42a}
+      \strng{authorfullhash}{fcf1c4dd64b173c183ef6911c8af959e}
+      \field{sortinit}{S}
+      \field{sortinithash}{b164b07b29984b41daf1e85279fbc5ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{PLOS Computational Biology}
+      \field{number}{10}
+      \field{title}{Ten Simple Rules for Reproducible Computational Research}
+      \field{volume}{9}
+      \field{year}{2013}
+      \field{pages}{e1003285}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.1371/journal.pcbi.1003285
+      \endverb
+    \endentry
     \entry{taskforce1996hrv}{article}{}
       \name{author}{1}{}{%
         {{hash=e3af9d001e56b1a42ee6871255e2643b}{%
@@ -460,6 +1085,167 @@
       \range{pages}{23}
       \verb{doi}
       \verb 10.1161/01.CIR.93.5.1043
+      \endverb
+    \endentry
+    \entry{virtanen2020scipy}{article}{}
+      \true{moreauthor}
+      \true{morelabelname}
+      \name{author}{6}{}{%
+        {{hash=18703a2bb6a62484483c193a212da2f8}{%
+           family={Virtanen},
+           familyi={V\bibinitperiod},
+           given={Pauli},
+           giveni={P\bibinitperiod}}}%
+        {{hash=646fbfe08374cc41c2f9bd971d8c4725}{%
+           family={Gommers},
+           familyi={G\bibinitperiod},
+           given={Ralf},
+           giveni={R\bibinitperiod}}}%
+        {{hash=d500f4849030f34359cdb3e1513acf83}{%
+           family={Oliphant},
+           familyi={O\bibinitperiod},
+           given={Travis\bibnamedelima E.},
+           giveni={T\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=35bb9c71f55048509a3e9018c349ed73}{%
+           family={Haberland},
+           familyi={H\bibinitperiod},
+           given={Matt},
+           giveni={M\bibinitperiod}}}%
+        {{hash=fbb0c40f5d70be8ce47ce9daafdf5749}{%
+           family={Reddy},
+           familyi={R\bibinitperiod},
+           given={Tyler},
+           giveni={T\bibinitperiod}}}%
+        {{hash=9fd9ed8466bbb96364ae008f2a665e6e}{%
+           family={Cournapeau},
+           familyi={C\bibinitperiod},
+           given={David},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{f252038edd7f112d75da3bf0c1edecbc}
+      \strng{fullhash}{5b778c12709d2ac79b769f11b206aa75}
+      \strng{bibnamehash}{5b778c12709d2ac79b769f11b206aa75}
+      \strng{authorbibnamehash}{5b778c12709d2ac79b769f11b206aa75}
+      \strng{authornamehash}{f252038edd7f112d75da3bf0c1edecbc}
+      \strng{authorfullhash}{5b778c12709d2ac79b769f11b206aa75}
+      \field{sortinit}{V}
+      \field{sortinithash}{afb52128e5b4dc4b843768c0113d673b}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Nature Methods}
+      \field{number}{3}
+      \field{title}{{SciPy} 1.0: Fundamental Algorithms for Scientific Computing in {Python}}
+      \field{volume}{17}
+      \field{year}{2020}
+      \field{pages}{261\bibrangedash 272}
+      \range{pages}{12}
+      \verb{doi}
+      \verb 10.1038/s41592-019-0686-2
+      \endverb
+    \endentry
+    \entry{wilson2017goodpractices}{article}{}
+      \name{author}{6}{}{%
+        {{hash=fda30198609a1ab29a82b93d4e8f347b}{%
+           family={Wilson},
+           familyi={W\bibinitperiod},
+           given={Greg},
+           giveni={G\bibinitperiod}}}%
+        {{hash=0f88b724c9f070dbceda00a5027d25bb}{%
+           family={Bryan},
+           familyi={B\bibinitperiod},
+           given={Jennifer},
+           giveni={J\bibinitperiod}}}%
+        {{hash=a79fa4e0923b252a711a37310ed57253}{%
+           family={Cranston},
+           familyi={C\bibinitperiod},
+           given={Karen},
+           giveni={K\bibinitperiod}}}%
+        {{hash=43698c36b205bdd65e89df3e8a106621}{%
+           family={Kitzes},
+           familyi={K\bibinitperiod},
+           given={Justin},
+           giveni={J\bibinitperiod}}}%
+        {{hash=fd85e07eb8018cd89be388380c4df3cf}{%
+           family={Nederbragt},
+           familyi={N\bibinitperiod},
+           given={Lex},
+           giveni={L\bibinitperiod}}}%
+        {{hash=920e9ef87c538906e1fdf4450d18c319}{%
+           family={Teal},
+           familyi={T\bibinitperiod},
+           given={Tracy\bibnamedelima K.},
+           giveni={T\bibinitperiod\bibinitdelim K\bibinitperiod}}}%
+      }
+      \strng{namehash}{4996f01033f1e72efe036963c2f02dac}
+      \strng{fullhash}{dab138b482fe11ec8f4505195cc57670}
+      \strng{bibnamehash}{dab138b482fe11ec8f4505195cc57670}
+      \strng{authorbibnamehash}{dab138b482fe11ec8f4505195cc57670}
+      \strng{authornamehash}{4996f01033f1e72efe036963c2f02dac}
+      \strng{authorfullhash}{dab138b482fe11ec8f4505195cc57670}
+      \field{sortinit}{W}
+      \field{sortinithash}{4315d78024d0cea9b57a0c6f0e35ed0d}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{PLOS Computational Biology}
+      \field{number}{6}
+      \field{title}{Good Enough Practices in Scientific Computing}
+      \field{volume}{13}
+      \field{year}{2017}
+      \field{pages}{e1005510}
+      \range{pages}{-1}
+      \verb{doi}
+      \verb 10.1371/journal.pcbi.1005510
+      \endverb
+    \endentry
+    \entry{wfdbpython}{misc}{}
+      \name{author}{6}{}{%
+        {{hash=74b4db65212feef0d99404441bcf9fd9}{%
+           family={Xie},
+           familyi={X\bibinitperiod},
+           given={Chen},
+           giveni={C\bibinitperiod}}}%
+        {{hash=8b80c41873689fd3f17765342832e87e}{%
+           family={McCullum},
+           familyi={M\bibinitperiod},
+           given={Lucas},
+           giveni={L\bibinitperiod}}}%
+        {{hash=68ed63f3019ef9e3dabede7d5c5239f9}{%
+           family={Johnson},
+           familyi={J\bibinitperiod},
+           given={Alistair},
+           giveni={A\bibinitperiod}}}%
+        {{hash=ee5dba98efcb604a84e148b6339ad236}{%
+           family={Pollard},
+           familyi={P\bibinitperiod},
+           given={Tom},
+           giveni={T\bibinitperiod}}}%
+        {{hash=4ee5ebdc5bce079199e41b66a01cfe72}{%
+           family={Gow},
+           familyi={G\bibinitperiod},
+           given={Brian},
+           giveni={B\bibinitperiod}}}%
+        {{hash=64d84f6b7d6b1cd1b82470cd4f4661b0}{%
+           family={Moody},
+           familyi={M\bibinitperiod},
+           given={Benjamin},
+           giveni={B\bibinitperiod}}}%
+      }
+      \strng{namehash}{0c72782193b921c3c6a04c6d9c9e6d95}
+      \strng{fullhash}{a60d9585295d96a29d4eefd0d0911a59}
+      \strng{bibnamehash}{a60d9585295d96a29d4eefd0d0911a59}
+      \strng{authorbibnamehash}{a60d9585295d96a29d4eefd0d0911a59}
+      \strng{authornamehash}{0c72782193b921c3c6a04c6d9c9e6d95}
+      \strng{authorfullhash}{a60d9585295d96a29d4eefd0d0911a59}
+      \field{sortinit}{X}
+      \field{sortinithash}{1965c258adceecf23ce3d67b05113442}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{PhysioNet}
+      \field{note}{Accessed: 2026-08-13}
+      \field{title}{Waveform Database Software Package ({WFDB}) for {Python}}
+      \field{year}{2023}
+      \verb{doi}
+      \verb 10.13026/9njx-6322
       \endverb
     \endentry
   \enddatalist
