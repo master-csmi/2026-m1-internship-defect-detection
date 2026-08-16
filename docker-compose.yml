@@ -3,7 +3,7 @@ services:
     notebook:
         build: .
         ports:
-            - "8888.8888"
+            - "8888:8888"
         volumes:
             - ./data:/app/data
             - ./results:/app/results
