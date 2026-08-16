@@ -17,8 +17,30 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{enumitem}
-%\usepackage[style=authoryear]{biblatex}
-%\addbibresource{references.bib}
+\usepackage{fancyhdr}
+\renewcommand{\headrulewidth}{0.4pt}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage[section]{placeins}
+\usepackage{listings}
+\usepackage{siunitx}
+\usepackage[backend=biber,style=numeric-comp,sorting=nyt,
+            maxbibnames=6,minbibnames=3,giveninits=true,
+            doi=true,url=true,isbn=false]{biblatex}
+\usepackage[capitalise,noabbrev]{cleveref}
+\pagestyle{fancy}
+\setlength{\headheight}{14pt}
+\fancyhf{}
+\fancyhead[L]{\small Anomaly Detection on Time-Series Data}
+\fancyhead[R]{\small M1 CSMI 2026}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\addbibresource{references.bib}
+\graphicspath{{images/}{../results/}}
 
 
 \title{Anomaly Detection on Time-Series Data: \\
@@ -67,50 +89,2181 @@
 
 
 
+\begin{center}
+  {\large\bfseries Abstract}
+\end{center}
 
-\tableofcontents
+\begin{quote}
+\small
+A long ECG recording contains more than a hundred thousand heartbeats, of which
+only a small fraction are abnormal, and the same imbalance appears in the
+vibration signals used for predictive maintenance in industry. This internship
+asks how well a machine can find those rare events on its own, and what it costs
+to help it with labels. Working on the MIT-BIH Arrhythmia
+Database~\cite{moody2001mitbih}, a complete chain was built from raw signal to a
+decision on every single beat, and ten methods were compared on it: three
+statistical baselines, two label-free models on 35 engineered features, two
+supervised classifiers and two autoencoders. All of them are measured under one
+protocol, fixed before any model was written: records are split by patient
+following de Chazal et al.~\cite{dechazal2004}, and the decision threshold is
+chosen only on the training half.
+
+Three results come out of the comparison. Supervision is worth about five times
+what all the feature engineering is worth put together (F1 rising from
+\num{0.427} to \num{0.721} on the same features), but what it buys is precision,
+not coverage: the labels teach the model to stop flagging beats that are merely
+unusual. Cost and accuracy do not move together, a forest of random cuts fitted
+in seconds coming within \num{0.032} of a neural network trained for several
+minutes. And the per-class results reverse the overall ranking on the hardest
+class: supraventricular beats are caught four times better by an autoencoder that
+never saw a label than by the best supervised model, because a model minimising
+overall error under a nine-to-one imbalance learns that ignoring a rare class
+costs it almost nothing. The two families therefore fail on different beats,
+which points to combining them. The whole study is delivered as an installable
+Python package with 64 tests, continuous integration and a published container
+image, so that every number reported here can be produced again.
+
+\medskip
+\noindent\textbf{Keywords:} anomaly detection, time series, ECG, MIT-BIH,
+class imbalance, autoencoders, reproducible research.
+\end{quote}
+
+
+
+
+% ---------------------------------------------------------------------------
+% Optional French résumé. To use it, add "french" to the babel options in the
+% preamble (\usepackage[french,english]{babel}) and uncomment the block below.
+%
+% \section*{Résumé}
+% \addcontentsline{toc}{section}{Résumé}
+% \begin{otherlanguage}{french}
+% Un enregistrement ECG de longue durée contient plus de cent mille battements,
+% dont une faible proportion seulement est anormale ; le même déséquilibre se
+% retrouve dans les signaux de vibration utilisés en maintenance prédictive. Ce
+% stage évalue dans quelle mesure une machine peut retrouver seule ces événements
+% rares, et ce que coûte le fait de l'aider avec des étiquettes. Sur la base
+% MIT-BIH, une chaîne complète du signal brut à une décision par battement a été
+% construite, puis dix méthodes ont été comparées sous un protocole unique fixé
+% avant tout modèle : séparation des enregistrements par patient et seuil choisi
+% uniquement sur la moitié d'entraînement. La supervision apporte environ cinq
+% fois plus que tout le travail sur les descripteurs, mais elle apporte de la
+% précision et non de la couverture ; le coût de calcul ne suit pas la qualité ;
+% et les battements supraventriculaires sont quatre fois mieux détectés par un
+% autoencodeur n'ayant jamais vu d'étiquette que par le meilleur modèle
+% supervisé. L'ensemble est livré sous forme de paquet Python installable, testé
+% et conteneurisé, afin que chaque chiffre puisse être reproduit.
+% \end{otherlanguage}
+% ---------------------------------------------------------------------------
+
 \newpage
+\tableofcontents
 
-\section{Introduction}
+\newpage
+\section{Introduction} \label{sec:introduction}
 
+
+\subsection{The electrocardiogram and cardiac arrhythmias} \label{subsec:ecg}
 
 Every heartbeat produces a small electrical signal that travels through the body and can be
-recorded at the skin's surface. The resulting trace from the electrocardiogram (ECG)
-is one of the oldest and most widely used diagnostic tools in medicine. In a healthy heart,
-this signal repeats itself (same characteristic shape) beat after beat. When something
-goes wrong, the shape and timing of the beat change. These irregularities are called 
-arrhythmias and some of them are early warnings of serious cardiac conditions.\\
+recorded at the skin's surface. The resulting trace, the electrocardiogram (ECG), is one of
+the oldest and most widely used diagnostic tools in medicine. In a healthy heart the signal
+repeats itself beat after beat with the same characteristic shape: a P wave, a sharp QRS
+complex and a T wave, separated by intervals whose duration is itself clinically
+meaningful~\cite{taskforce1996hrv}. When something goes wrong, the shape of the beat, its
+timing, or both, change. These irregularities are called arrhythmias, and some of them are
+early warnings of serious cardiac conditions~\cite{luz2016survey}.
 
-The difficulty is that arrhythmias are rare. Over twenty-four hours of monitoring,
-a patient produces more than a hundred thousand beats of which only a small fraction are
-abnormal. Reviewing such a recording manually is slow, tiring, precisely because the 
-interesting events are buried in a vast amount of unremarkable data. The only solution is 
-to automate the search by building a system that learns what a normal beat looks like
-and flags anything that departs from it.\\
+The difficulty is that arrhythmias are rare. At a resting rate of \SI{70}{\per\minute} a
+patient produces more than one hundred thousand beats over twenty-four hours of monitoring,
+of which only a small fraction are abnormal. The reference database used in this work, the
+MIT-BIH Arrhythmia Database~\cite{moody2001mitbih}, was assembled precisely to capture this
+regime: it contains roughly \num{110000} expert-annotated beats, and even though the records
+were deliberately selected to include clinically significant arrhythmias, normal beats still
+dominate by a wide margin. Reviewing such a recording manually is slow and tiring, precisely
+because the interesting events are buried in a vast amount of unremarkable data. The natural
+response is to automate the search: to build a system that learns what a normal beat looks
+like and flags anything that departs from it.
 
-This problem isn't unique to medicine. In industry, rotating machines produce vibration
-signals that behave the same way. A machine in good condition vibrates with a stable
-repetitive pattern. As a fault develops, whether through misalignment or a growing crack,
-that pattern changes before the machine actually fails. Detecting these early changes 
-is the foundation of predictive maintenance which aims to intervene before a breakdown
-rather than after it.\\
 
-Despite coming from different worlds, the two situations share the same structure.
-In both, we observe a one-dimensional signal that evolves over time, the signal is mostly normal
-and occasionally not. In both the central question is the same: how can a system
-automatically recognise what departs from normal behavior, without being told in advance
-what every possible abnormality looks like?\\
 
-This last point is what makes the problem interesting rather than
-routine. Anomalies are not simply a second class to be recognised alongside the first.
-They are rare, varied and new ones can always appear. What we need is a methos that 
-builds a strong model of normality and treats significaant deviation from it as suspicious. \\
 
-The aim of this internship is to develop, implement and evaluate methods for detecting 
-anomalies in the time-series signals, using ECG as the main case study and considering
-vibration signals as an extension of the same framework. The work will rely on the MIT-BIH
-Arrhythmia database, distributed by PhysioNet. 
+\subsection{The same problem in industry} \label{subsec:vibration}
 
+This problem is not unique to medicine. In industry, rotating machines produce vibration
+signals that behave in the same way. A machine in good condition vibrates with a stable,
+repetitive pattern governed by its rotation speed and its geometry. As a fault develops,
+whether through misalignment, imbalance or a growing crack in a bearing race, that pattern
+changes before the machine actually fails, and the change is visible in the statistics and
+in the spectrum of the vibration signal long before it is audible to an
+operator~\cite{randall2011bearing}. Detecting these early changes is the foundation of
+predictive maintenance, which aims to intervene before a breakdown rather than after
+it~\cite{lei2018review}.
+
+Despite coming from different worlds, the two situations share the same structure. In both
+we observe a one-dimensional signal that evolves over time; in both the signal is mostly
+normal and occasionally not; and in both the abnormal segments are rare, diverse, and costly
+to label. In both, the central question is the same: how can a system automatically recognise
+what departs from normal behaviour, without being told in advance what every possible
+abnormality looks like?
+
+\subsection{Why anomaly detection rather than classification} \label{subsec:why-anomaly-detection}
+
+This last point is what makes the problem interesting rather than routine. Anomalies are not
+simply a second class to be recognised alongside the first. They are rare, they are varied,
+and new ones can always appear. A classifier trained to separate two balanced classes assumes
+that both are well represented in the training data and that the test data will be drawn from
+the same distribution; neither assumption holds here. Anomaly detection instead builds a model
+of normality from data that is overwhelmingly normal, and treats a significant deviation from
+that model as suspicious~\cite{chandola2009survey}. The literature distinguishes several
+regimes along this axis, from fully supervised classification to purely unsupervised novelty
+detection, and the choice between them is driven by how many labels are available and how much
+one is willing to assume about the anomalies~\cite{ruff2021unifying}.
+
+The MIT-BIH database is unusual in that it is fully annotated, which means both regimes can be
+studied on exactly the same data. That is the opportunity this work exploits: rather than
+choosing one approach, we implement methods from the whole spectrum (statistical control
+charts, unsupervised detectors, and supervised classifiers) and evaluate them under a single
+protocol. The labels are then used in two different roles: withheld, to simulate the realistic
+situation where none exist, and used, to measure exactly what supervision buys.
+
+
+\subsection{Objectives and outline of the report} \label{subsec:objectives}
+
+The aim of this internship is to develop, implement and evaluate methods for detecting
+anomalies in time-series signals, with the ECG as the case study. The work relies entirely on
+the MIT-BIH Arrhythmia Database, distributed by PhysioNet~\cite{goldberger2000physionet}: no
+vibration data was used, and the industrial case of Section~\ref{subsec:vibration} serves as
+motivation rather than as a second experiment. What the pipeline would need in order to be
+carried over to a vibration signal is set out in Section~\ref{subsec:perspectives}. Four
+objectives structure the work:
+
+\begin{enumerate}[label=(O\arabic*)]
+  \item establish a rigorous and reproducible evaluation protocol, based on the AAMI EC57
+        beat groupings~\cite{aami2012ec57} and on the inter-patient train/test split
+        introduced by de Chazal et al.~\cite{dechazal2004}, so that no patient contributes to
+        both training and testing and the results remain comparable with published work;
+  \item implement a graded sequence of detection methods, from simple statistical baselines
+        through unsupervised models to supervised classifiers, all measured with the same
+        metrics on the same test set;
+  \item quantify what the addition of labels actually contributes, and identify which classes
+        of arrhythmia remain difficult and why;
+  \item deliver the whole study as reproducible software (an installable package, a test
+        suite, continuous integration and a container image) so that every number in this
+        report can be regenerated.
+\end{enumerate}
+
+The report follows the structure recommended by the CSMI internship
+guide~\cite{csmiguide}. 
+
+
+
+\section{Mission and Objectives} \label{sec:missions}
+
+\subsection{Assigned missions} \label{subsec:missions}
+
+The internship was defined around one question: can a machine find abnormal heartbeats
+in a long ECG recording on its own? Three missions were assigned.
+
+The first mission was to build a working chain from raw signal to decision. That 
+meant reading the recordings, cleaning them, cutting them into single beats,
+turning each beat into numbers, scoring each beat and finally saying normal or abnormal.
+Every stage had to run end to end without manual steps.
+
+The second mission was to cover the full range of methods rather than pick one.
+Simple statistical rules, methods that never see a label and methods that learn from 
+labels were required so that the report can say that each level of effort was worth it.
+The comparison only makes sense if all of them are judged on the same test set with the
+same numbers, so a fixed measuring protocol had to come before the models.
+
+The third mission was to leave behind software someone else can run. A published 
+report is not enough on its own: the code had to be installable as a package, covered
+by tests checked automatically at every change and shipped as a container so that the 
+results survive the internship~\cite{wilson2017goodpractices, sandve2013reproducible}.
+
+
+\subsection{Measurable Objectives and deliverables} \label{subsec:deliverables}
+
+The missions above, and the four aims of Section~\ref{subsec:objectives}, were
+turned into five objectives that can be checked, each with its own deliverable. \Cref{tab:deliverables} lists them together with the place in
+the repository~\cite{ammar2026repo} where the result can be found.
+
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Objectives, deliverables and where each one lives in the repository.}
+  \label{tab:deliverables}
+  \begin{tabular}{@{}p{0.30\textwidth}p{0.34\textwidth}p{0.28\textwidth}@{}}
+    \toprule
+    \textbf{Objective} & \textbf{Deliverable} & \textbf{Location} \\
+    \midrule
+    Fix a fair way of measuring, with no patient in both training and test
+      & Split, metrics and scoring functions, reused by every model
+      & \texttt{splits.py}, \texttt{evaluation.py} \\
+    \addlinespace
+    Give every later method something to beat
+      & Three statistical baselines: Z-score, CUSUM, spectral features
+      & \texttt{detectors.py}, \texttt{spectral.py}, notebook 02 \\
+    \addlinespace
+    Describe a beat with a small set of numbers
+      & 35 features per beat (rhythm, shape, wavelets) saved as a table
+      & \texttt{features.py}, \texttt{wavelets.py}, \texttt{features\_ds*.parquet} \\
+    \addlinespace
+    Measure what labels are worth
+      & Two label-free models and two supervised models on the same features
+      & \texttt{unsupervised.py}, \texttt{supervised.py}, notebooks 03--04 \\
+    \addlinespace
+    Make every number reproducible
+      & Installable package, test suite, continuous integration, container image
+      & \texttt{pyproject.toml}, \texttt{tests/}, \texttt{ci.yml}, \texttt{Dockerfile} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+Success was not defined as reaching a target score. A published score depends on
+the split, and the strict split chosen here~\cite{dechazal2004} gives lower numbers
+than the easy one used in many papers. The objective was instead that the ranking
+between methods be trustworthy, and that any single number in this report can be
+produced again from the repository.
+
+
+\subsection{Constraints (data, schedule, tooling)} \label{subsec:constraints}
+
+The dataset was decided from the start: the MIT-BIH Arrhythmia
+Database~\cite{moody2001mitbih}, kept online by PhysioNet~\cite{goldberger2000physionet}.
+It was not picked because it was easy to get, but because every single
+heartbeat in it carries a label. That is what lets the same data be used
+twice: once with the labels and once without them. The five beat groups
+come from the AAMI EC57 standard~\cite{aami2012ec57}, so the results can be
+described in the same words as other published work. The recordings weigh
+about \SI{650}{\mega\byte}, which is far too much for a Git repository.
+They are therefore downloaded only when needed: never committed, never
+copied into the container image, and attached at run time instead.
+
+All work was done on a laptop CPU and on free GitHub runners with two cores. 
+No GPU was available at any point. This shaped several choices: the deep models 
+are small, the grid searches are short, and the CPU-only build of PyTorch is 
+installed on purpose, because the default one pulls in about \SI{2.5}{\giga\byte} 
+of GPU libraries that would never be used.
+
+The internship was organised in stages, each ending with a merged pull request, 
+so that progress was visible and nothing was left half finished. 
+\Cref{tab:schedule} gives the order.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Order of the work stages.}
+  \label{tab:schedule}
+  \begin{tabular}{@{}clp{0.42\textwidth}@{}}
+    \toprule
+    \textbf{Stage} & \textbf{Topic} & \textbf{Main output} \\
+    \midrule
+    1 & Setup and exploration & Package skeleton, CI, notebook 01 \\
+    2 & Statistical baselines & Notebook 02, first comparison table \\
+    3 & Features and label-free models & 35 features, notebook 03 \\
+    4 & Supervised models & Notebook 04, SHAP analysis \\
+    5 & Deep learning & Two autoencoders, notebooks 05--06 \\
+    6 & Consolidation and writing & Final benchmark, container, this report \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+The language was Python. The choice of libraries was left open and the ones 
+retained are the standard scientific stack~\cite{harris2020numpy, virtanen2020scipy, mckinney2010pandas,
+hunter2007matplotlib}, \texttt{wfdb} for reading the recordings~\cite{wfdbpython}, 
+scikit-learn for the classical models~\cite{pedregosa2011sklearn}, XGBoost for 
+boosting~\cite{chen2016xgboost}, PyTorch for the autoencoders~\cite{paszke2019pytorch} and
+Docker~\cite{merkel2014docker} for the container. Git and GitHub were imposed as
+the working method, with one issue per task and one pull request per stage.
+
+
+
+
+\section{Context} \label{sec:context}
+
+
+\subsection{Host structure and scientific environment}\label{subsec:host}
+
+The internship took place within the CSMI programme of the University of
+Strasbourg, whose teaching is carried out jointly with the "Institut de Recherche
+Mathématique Avancée" (IRMA) and the Cemosis platform. Cemosis exists to connect
+mathematics with other fields and with companies, so the projects it hosts are
+rarely purely theoretical: they usually start from a real signal, a real
+measurement or a real industrial need, and end with software that someone else
+has to be able to run. The programme itself is built around scientific computing,
+machine learning and simulation, so a topic mixing signal processing, statistics
+and software engineering sits naturally inside it~\cite{csmiguide}.
+
+This background explains two features of work that would look like extra effort. 
+The first is the weight given to the software that means the container, the tests
+and the automatic checks are treated here as results. The second is the way the 
+problem is posed because a heartbeat and the vibration have nothing in 
+common medically, but they lead to the same mathematical question, and the habit 
+of looking for that shared structure comes from the programme's applied-mathematics 
+culture rather than from cardiology.
+
+
+
+\subsection{Existing tools, datasets and imposed choices}\label{subsec:existing}
+
+The internship started from an empty repository: the package layout, the
+naming convention and the continuous integration workflow were all built as
+part of the work. Three choices were settled before any model was
+written and never reopened.
+
+The dataset is the MIT-BIH Arrhythmia Database~\cite{moody2001mitbih}. It
+carries a cardiologist's label on every single beat, which is what allows
+the same recordings to be used twice: once pretending the labels do not
+exist, once using them. Beats are described with the five groups of the
+AAMI EC57 standard (N, S, V, F, Q)~\cite{aami2012ec57} rather than the raw
+annotation symbols, since any other vocabulary would be impossible to
+compare with the literature. Finally, the data is split by patient
+following de Chazal et al.~\cite{dechazal2004}: beats from one patient
+resemble each other far more than beats from different patients, so a split
+that lets the same patient appear on both sides measures memory rather than
+generalisation. This is detailed in Section~\ref{sec:data}; what matters
+here is that it was fixed before any model existed, so no result could be
+tuned against the test set.
+
+
+
+\subsection{State of the art in ECG beat classification}\label{subsec:sota}
+
+Finding where the beats are was solved in the 1980s: the detector of
+Pan and Tompkins~\cite{pan1985qrs} filters the signal to keep the frequency
+band of the QRS complex, squares it to make the peaks stand out, and reads
+them from a sliding window. Variants are still in use today. Deciding what
+kind of beat has been found is the part that is still open, and three
+families of approach dominate.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{The three families of approach to beat classification. They are
+ordered from the most demanding in labels to the least.}
+\label{tab:sota}
+\begin{tabular}{@{}p{0.21\textwidth}p{0.22\textwidth}p{0.24\textwidth}p{0.25\textwidth}@{}}
+\toprule
+\textbf{Approach} & \textbf{Needs} & \textbf{Reads} & \textbf{Fails when} \\
+\midrule
+Hand-made features and a classifier~\cite{dechazal2004, luz2016survey}
+\newline \emph{\Cref{sec:supervised}}
+& A large set of labelled beats
+& A short list of numbers measured on each beat
+& The useful clue was never measured \\
+\addlinespace
+Deep learning on the raw beat~\cite{kachuee2018}
+\newline \emph{\Cref{sec:deep}}
+& An even larger labelled set
+& The whole beat; it picks its own clues
+& The decision has to be explained \\
+\addlinespace
+Anomaly detection~\cite{chandola2009survey, ruff2021unifying}
+\newline \emph{\Cref{sec:features}, the focus here}
+& Examples of normal beats only
+& How far a beat sits from normal
+& The name of the problem is needed, not just a flag \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The first two families are the reference in the literature, but both assume
+a large annotated set. The third is the one this work is centred on: it
+matches the situation of most real deployments, where nobody has annotated
+a hundred thousand beats in advance.
+
+Two lessons from the literature shaped this internship directly. The first
+is methodological: the survey of Luz et al.~\cite{luz2016survey} shows that
+many published scores were obtained with patients present on both sides of
+the split, and are therefore much higher than the same method achieves
+under the stricter protocol; any comparison must first state which protocol
+it uses. The second is about where the difficulty lies. Ventricular beats
+are wide and misshapen, so nearly every method detects them. Supraventricular
+beats arrive early but keep an almost normal shape, so timing is the only
+clue. They remain the weak point of published systems, and
+Section~\ref{sec:results} shows they are the weak point of this one too.
+
+
+
+\section{Data} \label{sec:data}
+\subsection{Origin, licence and ethics}\label{subsec:origin}
+
+The recordings come from the MIT-BIH Arrhythmia Database~\cite{moody2001mitbih},
+distributed by PhysioNet~\cite{goldberger2000physionet}. They were collected at
+the Beth Israel Hospital in Boston in the 1970s and released for open research
+use, so no new patient was recorded for this work and no ethical approval was
+needed. The data carry no name, no date of birth and no hospital identifier: a
+patient is only a three-digit record number.
+
+The files are not stored in the repository. A script downloads them on demand
+into a local folder, and that folder is mounted inside the container at run time.
+This keeps the repository small and avoids redistributing data that already has
+an official home.
+
+\subsection{Description: records, sampling, annotations, AAMI classes}\label{subsec:description}
+
+The database holds 48 recordings of about half an hour each, sampled at
+\SI{360}{\hertz} on two leads. Only the first lead, MLII, is used here, because it
+is the one present in almost every record; keeping both would mean handling
+records where the second lead changes from one patient to the next.
+
+What makes this database usable for the present work is its annotation. A
+cardiologist marked every single beat, giving both its position in the signal and
+its type. The position is taken as ground truth, so no beat detector is needed and
+no detection error can contaminate the results. The type is a letter among about
+fifteen possible symbols, which are grouped into the five AAMI
+classes~\cite{aami2012ec57} as shown in \Cref{tab:aami}.\\ 
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.78\textwidth]{figures/record208_annotated.png}
+  \caption{Ten seconds of record 208 with the cardiologist's annotations. Each
+  dot marks one beat and carries its class: green for normal (N), red for
+  abnormal. The wide, smooth V beats are easy to tell apart from the sharp N
+  beats; the F beats sit between the two.}
+  \label{fig:annotated}
+\end{figure}
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Grouping of the annotation symbols into the five AAMI classes.}
+  \label{tab:aami}
+  \begin{tabular}{@{}clp{0.42\textwidth}@{}}
+    \toprule
+    \textbf{Class} & \textbf{Meaning} & \textbf{Symbols grouped} \\
+    \midrule
+    N & Normal beat            & N, L, R, e, j \\
+    S & Supraventricular beat  & A, a, J, S \\
+    V & Ventricular beat       & V, E \\
+    F & Fusion beat            & F \\
+    Q & Paced or unclassifiable& /, f, Q, P \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.78\textwidth]{figures/beat_morphology.png}
+  \caption{All beats of record 208 aligned on their R-peak, one panel per class,
+  with the average shape in black. A normal beat is a sharp spike; a ventricular
+  beat is wider and followed by a deep dip; a fusion beat mixes the two. This is
+  the shape information the morphological features of
+  Section~\ref{sec:features} are meant to capture.}
+  \label{fig:morphology}
+\end{figure}
+
+\subsection{Class imbalance and excluded records}\label{subsec:imbalance}
+
+Counting every annotated beat in the database gives \num{109494} beats, spread
+very unevenly over the five classes (\Cref{tab:classcounts}).
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Number of beats per AAMI class over the 48 records.}
+  \label{tab:classcounts}
+  \begin{tabular}{@{}lrr@{}}
+    \toprule
+    \textbf{Class} & \textbf{Beats} & \textbf{Share} \\
+    \midrule
+    N & \num{90631} & \SI{82.8}{\percent} \\
+    Q & \num{8043}  & \SI{7.3}{\percent} \\
+    V & \num{7236}  & \SI{6.6}{\percent} \\
+    S & \num{2781}  & \SI{2.5}{\percent} \\
+    F & \num{803}   & \SI{0.7}{\percent} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.55\textwidth]{figures/class_distribution.png}
+  \caption{Beats per AAMI class over the 48 records. The vertical scale is
+  logarithmic: on a normal scale the four small classes would be invisible next
+  to N. Each step up the axis is a factor of ten.}
+  \label{fig:classdist}
+\end{figure}
+
+There are about 113 normal beats for every fusion beat. This single fact drives
+most of the choices made later: a model that answers ``normal'' every time is
+right more than four times out of five, so plain accuracy is useless here, and the
+rare classes need care during training. Section~\ref{sec:evaluation} returns to
+this.
+
+Four records (102, 104, 107 and 217) come from patients fitted with a pacemaker.
+Their beats are shaped by the device rather than by the heart, so they follow
+rules no model can learn from the others. They are excluded, as is standard
+practice~\cite{aami2012ec57, dechazal2004}. This also explains why the Q class
+nearly disappears from the working set: most of its beats belong to those four
+records.
+
+\subsection{Inter-patient split DS1/DS2 and leakage control}\label{subsec:split}
+
+The 44 remaining records are cut into two groups of 22, following de Chazal et
+al.~\cite{dechazal2004}: DS1 for training, DS2 for testing. The cut is made at the
+level of the record, so a patient is either entirely in training or entirely in
+testing, never in both.
+
+This matters more than it may seem. Two beats from the same patient look almost
+identical, so if the same patient appears on both sides, a model can score very
+well simply by recognising that patient. The number obtained then says nothing
+about a new patient walking into a clinic. Published scores obtained without this
+precaution are much higher than the ones in this report, and they are not
+comparable~\cite{luz2016survey}.
+
+The split is not a comment in a notebook but a fixed list in the code, guarded by
+checks that run in the test suite: no record can be in both sets, no paced record
+can slip back in, and each set must contain exactly 22 records. A leak becomes a
+failing test rather than a silent mistake.
+
+\subsection{Pre-processing: filtering, beat segmentation, normalisation} \label{subsec:preprocessing}
+
+Three steps turn a raw half-hour recording into beats a model can read.
+
+\paragraph{Filtering.} A band-pass filter keeps only the frequencies between
+\SI{0.5}{\hertz} and \SI{10}{\hertz}. Below that lies baseline wander, the slow
+drift caused by breathing and by electrodes moving; above it lies mains hum and
+muscle noise. The filter is applied forwards and then backwards, which cancels the
+delay it would otherwise introduce. This was checked directly: a single spike fed
+through the filter comes out at exactly the same sample, so the R-peak positions
+given by the annotations stay valid.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.78\textwidth]{statistical_baseline/figures/raw_vs_filtered.png}
+  \caption{Ten seconds of record 105 before and after filtering. The slow drift
+  and the fuzz are gone while the peaks keep their position and their relative
+  height. The effect is not cosmetic: at a fixed threshold of 3, the number of
+  flagged samples changes by about \SI{19}{\percent} between the two signals.}
+  \label{fig:rawfiltered}
+\end{figure}
+
+\paragraph{Segmentation.} Around each annotated R-peak a window is cut, from
+\SI{0.25}{\second} before to \SI{0.40}{\second} after, that is 234 samples. The
+window is not symmetric on purpose: the P wave sits close before the peak while
+the T wave stretches further after it. Beats too close to the start or the end of
+a recording are dropped, since their window would fall outside the signal.
+
+\paragraph{Normalisation.} Each recording is centred and divided by its own
+standard deviation. Electrode placement and skin contact change the amplitude from
+one patient to the next, and without this step a model would learn the recording
+conditions instead of the shape of the beat.
+
+
+\subsection{Relevance and limitations}\label{subsec:datalimits}
+
+This database is the right choice for the question asked, but it is not a fair
+picture of clinical reality, and three points must be stated plainly.
+
+It is small and old. Forty-eight recordings from the 1970s, on equipment long
+replaced, with a patient group chosen by the original authors to contain many
+arrhythmias. Real hospital data would be noisier and far more lopsided.
+
+The labels are treated as truth, yet they were placed by humans. Cardiologists
+disagree on borderline beats, so part of what a model is asked to reproduce is
+one team's judgement rather than an absolute fact.
+
+The beats are given, not found. Because the annotations supply the R-peak
+positions, this work never faces the errors a real system would make while looking
+for the beats in the first place. Every score in this report is therefore an
+optimistic view of what a complete pipeline would achieve.
+
+
+
+
+
+\section{Evaluation Protocol} \label{sec:evaluation}
+
+Every method in this report is judged by the same rules, fixed once and written in
+a single module reused everywhere. This section states those rules before any
+model appears, so that no choice made later can be adjusted to flatter a result.
+
+\subsection{Beat-level formulation of the detection problem}\label{subsec:formulation}
+
+The unit of decision is the beat, not the recording and not a window of signal. A
+recording is a list of beats, and each beat gets its own answer.
+
+The five AAMI classes are then folded into two. A beat labelled N is normal; a
+beat labelled S, V, F or Q is an anomaly. This turns the task into a yes-or-no
+question, and there are three reasons for it.
+
+The first is that it matches the goal. The aim is to find beats worth a second
+look, not to name the exact arrhythmia, which is a physician's job.
+
+The second is that it puts every method on the same footing. Isolation Forest and
+an autoencoder do not produce a class, they produce a single number saying how
+strange a beat looks. A five-class task would leave them out of the comparison
+entirely.
+
+The third is that the rarest classes are too thin to support a five-way decision
+under a strict split. Fusion beats are well under one percent of the data, and a
+score computed on so few examples moves far too much to mean anything.
+
+Each method therefore outputs one number per beat, high meaning suspicious. A
+threshold turns that number into a decision. The class labels are not thrown away:
+they come back in Section~\ref{sec:results} to show which kinds of beat each
+method actually finds.
+
+
+\subsection{Metrics under strong imbalance}\label{subsec:metrics}
+
+About one beat in six is an anomaly, so accuracy is discarded from the start: a
+model that always answers ``normal'' would score above \SI{80}{\percent} while
+finding nothing. Four numbers are reported instead, all computed on DS2, and
+\Cref{tab:metrics} says what each one is for.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Reported metrics and what each one answers.}
+  \label{tab:metrics}
+  \begin{tabular}{@{}lp{0.30\textwidth}p{0.34\textwidth}@{}}
+    \toprule
+    \textbf{Metric} & \textbf{Question it answers} & \textbf{Why it is needed} \\
+    \midrule
+    Precision & Of the beats flagged, how many really were abnormal?
+      & A low value means a physician wastes time on false alarms \\
+    \addlinespace
+    Recall & Of the abnormal beats, how many were flagged?
+      & A low value means sick beats are missed, which is the costlier error \\
+    \addlinespace
+    F1 & The balance between the two above
+      & A single number to rank methods, since one can always be raised by
+        sacrificing the other \\
+    \addlinespace
+    ROC AUC & How well the scores separate the two groups, at any threshold
+      & Judges the score itself, independently of where the cut is placed \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+F1 and ROC AUC answer different questions and can disagree, which is informative
+rather than awkward: a method with a good AUC and a poor F1 ranks beats correctly
+but has been cut in the wrong place.
+
+The four raw counts behind these numbers, true and false positives and negatives,
+are stored alongside them for every experiment. They allow any figure in this
+report to be recomputed, and they are what makes the error analysis of
+Section~\ref{sec:validation} possible.
+
+
+\subsection{Threshold selection on DS1}\label{subsec:threshold}
+
+A score becomes a decision only once a threshold is chosen, and the choice changes
+the result completely. Picking it on the test set would mean reporting the best
+possible outcome rather than an honest one.
+
+The threshold is therefore always chosen on DS1, the training half. Two hundred
+candidate values are taken across the range of the training scores, each is tried,
+and the one giving the best F1 on DS1 is kept. That value is then frozen and
+applied to DS2 without any further adjustment.
+
+The consequence is deliberate: the threshold is slightly wrong for DS2, because
+patients differ and the score distribution shifts between the two halves. The
+reported numbers are a little lower than the best achievable, and that gap is
+exactly what a real system would face on a new patient.
+
+\subsection{Reference baselines}\label{subsec:baselines}
+
+A score means nothing on its own, so three reference points frame every result.
+
+The lowest is chance: a detector flagging beats at random, whose precision equals
+the share of anomalies in the data. Anything not clearly above it has learned
+nothing.
+
+The middle one is the statistical baselines of Section~\ref{sec:statistical},
+which use no machine learning at all. A method costing far more computing power
+than these has to justify the cost by beating them.
+
+The highest is the supervised models of Section~\ref{sec:supervised}, which are
+trained on the labels. They mark what the same features are worth when the answers
+are known, and the distance between them and the label-free methods is the central
+measurement of this work.
+
+Published results are used as a fourth reference, but only those obtained under
+the same inter-patient split. Comparing against numbers from the easier protocol
+would be meaningless, and Section~\ref{sec:validation} handles that comparison
+carefully.
+
+
+
+
+\section{Statistical Baselines} \label{sec:statistical}
+
+Before any learning, three simple detectors were built. None of them is trained
+and none uses a label. They exist to set the floor: a method that costs a
+thousand times more computing power has to beat these to be worth anything.
+
+\subsection{Z-score on sliding windows} \label{subsec:zscore}
+
+The idea is the oldest one in statistics. Around each sample, a window of the
+signal is taken, its average and its spread are computed, and the sample is scored
+by how many spreads it sits away from that average. The absolute value is used, so
+a spike upwards and a dip downwards count the same.
+
+Everything depends on the width of the window, which is what ``normal'' is
+measured against. Two widths were tried, one second and ten seconds, and they
+behave in opposite ways.
+
+The one-second window fails completely. It is barely wider than a beat, so the
+window sits mostly inside the beat it is judging: the beat becomes its own
+reference, and the score no longer separates anything. Its ROC AUC is
+\num{0.274}, below the \num{0.5} of pure chance. That is not a small failure, it
+is an inversion: the detector ranks abnormal beats as \emph{more} normal than the
+rest. \Cref{fig:zscore1s} shows why.
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.78\textwidth]{statistical_baseline/figures/zscore_one_second.png}
+  \caption{Z-score with a one-second window on record 105. Every beat crosses the
+  line, normal ones included, because the window is barely wider than a beat and
+  so contains almost nothing to compare against. The detector marks the R-peaks
+  rather than the abnormal beats.}
+  \label{fig:zscore1s}
+\end{figure}
+
+
+The ten-second window works, in a narrow sense. Covering roughly ten beats, it
+gives a real reference (\Cref{fig:zscore10s}), and its precision reaches
+\num{0.652}: when it flags a beat, it is usually right. But its recall is
+\num{0.175}, so it misses more than four abnormal beats out of five. It only
+catches the tall and obvious ones.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.78\textwidth]{statistical_baseline/figures/zscore_ten_seconds.png}
+  \caption{The same signal scored with a ten-second window. The score no longer
+  rises at every beat, because the window now holds about ten beats to compare
+  against. Only the beats that stand out from their neighbours cross the line.}
+  \label{fig:zscore10s}
+\end{figure}
+
+\subsection{CUSUM} \label{subsec:cusum}
+
+The Z-score looks at each sample alone, so a small but lasting change goes
+unnoticed. CUSUM is built for exactly that case. It keeps a running total: at each
+step it adds how far the signal is from normal, minus a small allowance $k$, and
+resets the total to zero whenever it would go negative. Small deviations that keep
+pointing the same way accumulate; random noise cancels itself out. Two totals are
+kept, one for drift upwards and one for drift downwards, and the score is the
+larger.
+
+The allowance $k$ decides what counts as too small to bother with. Four values
+were tried; $k = 0.5$ was kept. A smaller $k$ makes the total climb on noise
+alone, a larger one lets real drift pass unnoticed.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.78\textwidth]{statistical_baseline/figures/cusum_score_k_0.5.png}
+  \caption{CUSUM score with $k=0.5$ on record 105. The total climbs at each beat
+  and falls back to zero between beats, which shows the accumulation working.
+  It also shows the method's limit: the score stays high well after the peak
+  that caused it, so it marks a stretch of signal rather than one beat.}
+  \label{fig:cusum}
+\end{figure}
+
+CUSUM reaches an F1 of \num{0.369} with a ROC AUC of \num{0.680}, better balanced
+than the Z-score but still far from usable. Its weakness is inherent to the
+method: a total that accumulates keeps rising after the event that caused it, so
+the score marks a stretch of signal rather than a single beat.
+
+\subsection{Spectral features} \label{subsec:spectral}
+
+The first two detectors read the signal in time. The third reads it in frequency,
+which is a better match for the problem, since an abnormal beat is often abnormal
+in shape: a ventricular beat is wide and smooth, so its energy sits lower in the
+spectrum than a normal beat's sharp spike.
+
+Each beat is transformed with a Fourier transform, after multiplying it by a Hann
+window so that the cut edges of the beat do not add energy that is not really
+there. Six numbers are then read off the spectrum (\Cref{tab:spectralfeat}).
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{The six spectral descriptors computed per beat.}
+  \label{tab:spectralfeat}
+  \begin{tabular}{@{}lp{0.52\textwidth}@{}}
+    \toprule
+    \textbf{Descriptor} & \textbf{What it measures} \\
+    \midrule
+    Centroid   & Where the energy sits on average: the ``pitch'' of the beat \\
+    Bandwidth  & How widely the energy is spread around that centre \\
+    Entropy    & Whether the energy is concentrated or scattered everywhere \\
+    Dominant frequency & The single strongest frequency \\
+    Low-frequency ratio  & Share of the energy below \SI{10}{\hertz} \\
+    High-frequency ratio & Share of the energy above \SI{20}{\hertz} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Each of the six is turned into a Z-score across all beats, and the score of a beat
+is the largest of the six. A beat is therefore flagged if it is unusual in any one
+respect, rather than having to be unusual in all of them.
+
+This is the best of the three baselines: F1 \num{0.373} and ROC AUC \num{0.773}.
+The split between the two numbers is worth noting, since it recurs for every method
+that follows: the ranking is decent while the threshold sits badly, so the score
+carries more information than the yes-or-no decision manages to use.
+
+\subsection{Results and discussion} \label{subsec:statresults}
+
+\Cref{tab:statbaselines} collects the results on DS2, with a random detector added
+for reference.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Statistical baselines on the test set DS2. Best F1 in bold.}
+  \label{tab:statbaselines}
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    \textbf{Method} & \textbf{Precision} & \textbf{Recall} & \textbf{F1}
+      & \textbf{ROC AUC} \\
+    \midrule
+    Spectral features    & 0.297 & 0.502 & \textbf{0.373} & 0.773 \\
+    CUSUM ($k=0.5$)      & 0.410 & 0.335 & 0.369 & 0.680 \\
+    Z-score (\SI{10}{\second}) & 0.652 & 0.175 & 0.276 & 0.615 \\
+    Random baseline      & 0.110 & 0.996 & 0.198 & 0.500 \\
+    Z-score (\SI{1}{\second})  & 0.110 & 0.997 & 0.198 & 0.274 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Four points deserve to be kept.
+
+The random detector shows why precision must be read next to recall. It flags
+almost everything, so its recall is \num{0.996}, and its precision of \num{0.110}
+is simply the share of abnormal beats in DS2. Any method whose precision is near
+\num{0.11} has learned nothing, whatever its recall.
+
+The one-second Z-score is worse than random, and this is the most useful failure
+of the section. It shows that a badly chosen scale does not merely weaken a
+detector, it can reverse it. The window has to be wide enough to contain a
+reference the beat is not part of.
+
+Every baseline trades precision against recall and none escapes the trade. The
+ten-second Z-score is precise but nearly blind; the spectral detector sees twice
+as much but is wrong twice as often when it speaks. No threshold fixes this,
+because the underlying scores are simply not sharp enough.
+
+Finally, the best of the three reaches an F1 of \num{0.373}. That is the number
+every later method has to beat, and it was obtained without a single label and in
+a few seconds of computation.
+
+The lesson carried into the next section is where the limit lies. Each of these
+detectors reduces a beat to one number, chosen in advance. A beat is not one
+number: it has a duration, a shape, a timing relative to its neighbours. The next
+step is to describe a beat with a proper set of measurements and let a model
+combine them.
+
+
+
+\section{Feature Engineering and Unsupervised Detection} \label{sec:features}
+
+The baselines of Section~\ref{sec:statistical} all failed the same way: each one
+squeezed a beat into a single number decided in advance. This section does the
+opposite. Every beat is described by 35 numbers from four different points of
+view, and a model is left to work out which combinations are unusual. The labels
+are still not used for training.
+
+\subsection{Rhythm features} \label{subsec:rhythm}
+
+Rhythm is about \emph{when} a beat arrives, not what it looks like. The building
+block is the RR interval, the time between one R-peak and the next. Nine numbers
+are computed per beat (\Cref{tab:rhythmfeat}).
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{The nine rhythm features.}
+  \label{tab:rhythmfeat}
+  \begin{tabular}{@{}lp{0.55\textwidth}@{}}
+    \toprule
+    \textbf{Feature} & \textbf{What it measures} \\
+    \midrule
+    \texttt{pre\_rr}, \texttt{post\_rr} & Time to the previous and to the next beat \\
+    \texttt{rr\_ratio}      & Whether the beat sits early or late between its neighbours \\
+    \texttt{local\_rr\_mean}& The patient's current pace, over the ten nearest beats \\
+    \texttt{rr\_deviation}  & This beat's gap compared with that local pace \\
+    \texttt{local\_sdnn}    & How irregular the rhythm is around this beat \\
+    \texttt{local\_rmssd}   & How much the gap jumps from one beat to the next \\
+    \texttt{local\_pnn50}   & Share of nearby gaps changing by more than \SI{50}{\milli\second} \\
+    \texttt{heart\_rate}    & Beats per minute at this point \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The word \emph{local} carries the whole idea. A resting athlete and a patient with
+a fast heart have very different gaps, so an absolute value cannot say much. What
+matters is whether a beat breaks \emph{that patient's} current pattern, so every
+comparison is made against a window of ten surrounding beats rather than against
+the whole recording.
+
+This is also the only family of features able to see a supraventricular beat. An S
+beat keeps a nearly normal shape and betrays itself only by arriving too early,
+which shows up in \texttt{rr\_deviation} and nowhere else.
+
+Two edge cases had to be handled: the first beat of a record has nothing before it
+and the last has nothing after it. Both are filled with the median gap of the
+record, which avoids inventing an extreme value at either end.
+
+\subsection{Morphological features} \label{subsec:morphological}
+
+Morphology is about the shape of the beat window itself, and ten numbers describe
+it: the root mean square, the variance, the standard deviation, the peak-to-peak
+range, the largest absolute value, the total energy, the mean absolute deviation,
+the skewness, the kurtosis, and the number of zero crossings.
+
+Most of these say how big the beat is and how spread out its values are. Three are
+worth singling out. Skewness says whether the beat leans up or down, which
+separates a sharp positive spike from the deep dip that follows a ventricular
+beat. Kurtosis says whether the energy is concentrated in one peak or spread
+across the window: a normal beat is a narrow spike and scores high, a wide V beat
+scores much lower. Zero crossings count how often the signal changes sign, which
+rises sharply on a noisy or fragmented beat.
+
+Two of them are undefined on a perfectly flat window, since both divide by the
+spread. They are set to zero in that case rather than allowed to become infinite,
+which would break every model downstream.
+
+\subsection{Wavelet features} \label{subsec:wavelets}
+
+The Fourier transform used in Section~\ref{subsec:spectral} says which frequencies
+are present in a beat, but not \emph{when} inside the beat they occur. That
+information matters here: a normal beat and a ventricular beat can hold similar
+frequencies arranged in a completely different order. Wavelets keep both axes, and
+two transforms are used.
+
+The discrete transform (DWT, Daubechies-4, four levels) splits the beat into five
+bands, from the slow overall shape down to the fastest detail. For each band, two
+numbers are kept: the share of the beat's energy it holds, and how much that band
+varies. Because the transform conserves energy, the five shares add up to one, so
+they describe how the beat spreads its energy rather than how loud it is. A wide,
+smooth abnormal beat pushes its energy into the slow bands; a sharp or noisy one
+pushes it into the fast ones.
+
+The continuous transform (CWT, Morlet wavelet) is what actually keeps the timing.
+It produces a scalogram, a picture of the beat with time across and frequency up
+(\Cref{fig:scalogram}). Four frequency bands are read off it, and each gives two
+numbers: how much energy the band holds, and at which moment inside the beat that
+energy peaks, expressed as a position between 0 at the start of the window and 1
+at the end. That second number is the one the Fourier transform simply cannot
+produce.
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.78\textwidth]{features_unsupervised/figures/scalogram_normal_vs_v.png}
+  \caption{A normal beat (left) and a ventricular beat (right), each above its
+  scalogram. Bright means energy. The normal beat keeps its energy low and
+  narrow, concentrated at the instant of the spike. The ventricular beat is far
+  brighter and reaches much higher up the scale axis, and its energy is spread
+  over a wider stretch of the window. The two axes together are what a plain
+  Fourier transform would collapse into one.}
+  \label{fig:scalogram}
+\end{figure}
+
+
+Put side by side, the four families give 35 numbers per beat: 9 rhythm, 10
+morphological, 6 spectral and 10 wavelet. They are computed once for DS1 and once
+for DS2 and saved as tables, so every model that follows reads the same numbers
+and no result depends on recomputing them.
+
+\subsection{Isolation Forest} \label{subsec:iforest}
+
+Isolation Forest works from an idea that is almost too simple. Pick a feature at
+random, pick a cut point at random, split the data, and repeat. A point in the
+middle of the crowd needs many cuts before it ends up alone. A point far from the
+others gets separated after a few. The average number of cuts needed to isolate a
+beat becomes its score.
+
+Two hundred such trees are grown. The \texttt{contamination} setting is left at
+\num{0.1}, meaning the model assumes about one beat in ten is unusual, which is
+close to the real share in DS2 without having been read from it. The sign of the
+output is flipped so that, here as everywhere else in this report, a high score
+means suspicious.
+
+The features are standardised first. The trees themselves do not need it, since a
+split on one feature ignores the scale of the others, but it keeps the preparation
+identical to the one the SVM requires, so the two models are compared on exactly
+the same input.
+
+\subsection{One-class SVM} \label{subsec:ocsvm}
+
+The one-class SVM takes the opposite route. Instead of separating points, it draws
+a boundary around the region where the training data lives and flags whatever
+falls outside. The boundary is drawn with an RBF kernel, so it can curve rather
+than being a straight line. The setting $\nu = 0.1$ is roughly the share of
+training beats the model is allowed to leave outside its own boundary.
+
+Standardisation is not optional here. The RBF kernel measures distances between
+beats, so a feature with large raw values, such as energy, would dominate every
+distance and the others would be ignored.
+
+One practical obstacle had to be handled. The cost of this model grows with the
+square of the number of beats, and DS1 holds roughly 50\,000 of them, which makes
+a full fit impractical on the available hardware. The model is therefore trained
+on a random sample of 20\,000 beats, drawn with a fixed seed so the result can be
+reproduced. Scoring is still done on every beat of DS2.
+
+\subsection{Results and discussion} \label{subsec:unsupresults}
+
+\Cref{tab:unsupresults} adds the two models to the baselines of the previous
+section.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Label-free methods on DS2, with the statistical baselines for
+  comparison. Best F1 in bold.}
+  \label{tab:unsupresults}
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    \textbf{Method} & \textbf{Precision} & \textbf{Recall} & \textbf{F1}
+      & \textbf{ROC AUC} \\
+    \midrule
+    Isolation Forest     & 0.343 & 0.566 & \textbf{0.427} & \textbf{0.836} \\
+    Spectral features    & 0.297 & 0.502 & 0.373 & 0.773 \\
+    CUSUM ($k=0.5$)      & 0.410 & 0.335 & 0.369 & 0.680 \\
+    Z-score (\SI{10}{\second}) & 0.652 & 0.175 & 0.276 & 0.615 \\
+    One-Class SVM        & 0.200 & 0.437 & 0.275 & 0.687 \\
+    Random baseline      & 0.110 & 0.996 & 0.198 & 0.500 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Isolation Forest takes the lead on both numbers, and the AUC is the more
+interesting of the two. At \num{0.836} it is well above the \num{0.773} of the
+best baseline: the ranking of the beats is genuinely better, not just the
+threshold. Thirty-five features combined by a model beat one number chosen by
+hand, which is the result this section was built to test.
+
+The One-Class SVM is the surprise, and not a good one. Despite being the more
+sophisticated method it lands below the spectral baseline, with a precision of
+\num{0.200} that is barely above chance. Three explanations are plausible and the
+data does not separate them cleanly. It saw only 20\,000 beats rather than
+50\,000. Its single boundary must enclose the normal beats of 22 different
+patients at once, which is a much harder shape than a forest of independent cuts
+has to fit. And its two settings, $\nu$ and $\gamma$, were left at sensible
+defaults rather than searched, because searching them without touching DS2 was too
+costly here. The honest conclusion is that the model is not ruled out, only that
+it was not made to work under these constraints.
+
+The gap between F1 and AUC persists for Isolation Forest: an AUC of \num{0.836}
+against an F1 of \num{0.427}. Section~\ref{subsec:overall} returns to this
+pattern, which every method in this report shares.
+
+Overall the best label-free method reaches an F1 of \num{0.427}, against
+\num{0.373} for the best method costing nothing. That is a real gain but a modest
+one, and it comes at a much higher price in features and computation. Whether the
+labels are worth more than the features is exactly the question
+Section~\ref{sec:supervised} answers, using the same 35 numbers.
+
+
+
+\section{Supervised Classification} \label{sec:supervised}
+
+Everything so far worked without labels. This section uses them. The features are
+exactly the same 35 numbers as in Section~\ref{sec:features}, and the split, the
+metrics and the threshold rule are unchanged. The only difference is that the
+model is now told, during training, which beats are abnormal. Whatever the scores
+gain is therefore the price of the labels and nothing else.
+
+\subsection{Random Forest} \label{subsec:rf}
+
+A single decision tree learns fast and remembers too much. A forest grows two
+hundred of them, each on a different random view of the data, and averages their
+votes. What one tree learned by accident the others do not repeat, so the average
+is far steadier than any of its parts.
+
+Four settings were searched over a small grid: the maximum depth of a tree,
+the smallest number of beats allowed in a leaf, and whether the rare class is
+given extra weight. The grid was kept deliberately small, enough to see whether
+tuning helps at all without spending a day of computation on it.
+
+The search uses grouped cross-validation, and this is the point that matters most
+in the whole section. An ordinary five-fold split would scatter one patient's
+beats across all five folds, so the model would be validated on beats from a
+patient it had already trained on, and the search would pick the settings best at
+recognising patients. Grouping by record keeps every beat of a patient inside a
+single fold. It is the same precaution as the DS1/DS2 split, applied one level
+down, inside the training half.
+
+\subsection{Gradient Boosting (XGBoost)} \label{subsec:xgb}
+
+A forest builds its trees independently. Boosting builds them one after another,
+each new tree working on what the previous ones got wrong. The result is usually
+sharper, at the price of being easier to overfit, which is why the learning rate
+matters: it decides how much of each new tree's correction is actually applied.
+
+Four settings were searched: the number of trees, their depth, the learning rate,
+and the weight given to the rare class. That last one is not a fixed number. It is
+computed from the data as the ratio of normal to abnormal beats, so it adapts if
+the imbalance changes rather than hard-coding a value that is only correct for
+this dataset.
+
+\subsection{Handling imbalance} \label{subsec:imbalance-handling}
+
+About nine beats in ten are normal, so a model minimising its total error can do
+very well by rarely saying anything else. Both models are given a way out of that
+trap, and in both cases it is a weight rather than a change to the data.
+
+The Random Forest can set \texttt{class\_weight} to balanced, which makes a
+mistake on an abnormal beat count as much as many mistakes on normal ones. XGBoost
+has \texttt{scale\_pos\_weight}, which does the same thing. In both cases the
+weighted and unweighted versions were put in the grid, so the search decides
+whether reweighting actually helps rather than it being assumed.
+
+Two alternatives were rejected. Discarding normal beats to even out the counts
+would throw away most of the data, including all the variety of normal beats
+across 22 patients, which is precisely what the model needs to learn. Creating
+artificial abnormal beats would invent examples nobody recorded, and on a medical
+signal that is hard to defend.
+
+\subsection{Interpretability with SHAP} \label{subsec:shap}
+
+A forest of two hundred trees gives no readable rule, which is a serious problem
+if a physician is ever meant to trust it. SHAP addresses this by measuring, for
+one beat, how much each feature pushed the decision towards ``anomaly'' or away
+from it~\cite{lundberg2017shap}. Averaged over many beats it says which features
+matter in general (\Cref{fig:shapimp}); read on a single beat it explains that one
+decision (\Cref{fig:shapone}).
+
+The explanation is computed on a sample of one thousand beats. Explaining all
+fifty thousand would take far longer and the picture does not change.
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.66\textwidth]{supervised_ml/figures/shap_importance.png}
+  \caption{The fifteen features that weigh most in the Random Forest, averaged
+  over a sample of beats. The four at the top are all rhythm features, and they
+  are well clear of the rest. Shape and frequency features appear next, but each
+  contributes much less on its own.}
+  \label{fig:shapimp}
+\end{figure}
+
+
+The ranking is worth reading closely, because it was not designed. Nobody told the
+model that rhythm matters more than shape; it found that out from the data, and it
+agrees with what a cardiologist would say. \texttt{heart\_rate} and
+\texttt{rr\_deviation} lead, followed by \texttt{pre\_rr} and \texttt{rr\_ratio}:
+all four are about \emph{when} the beat arrived. The strongest shape feature,
+\texttt{spectral\_centroid}, comes only fifth, and the wavelet features sit near
+the bottom of the list.
+
+This is a useful and slightly uncomfortable result. Ten wavelet numbers per beat
+cost most of the computation time of the feature step, and they contribute little
+compared with a simple ratio of two intervals.
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.66\textwidth]{supervised_ml/figures/shap_one_beat.png}
+  \caption{The same analysis on one single beat, a ventricular beat from record
+  200. Every bar points towards ``anomaly''. The decision rests first on the beat
+  arriving out of step with its neighbours, then on its frequency content being
+  shifted low. This is the kind of short, checkable account a physician could be
+  shown alongside a flag.}
+  \label{fig:shapone}
+\end{figure}
+
+
+\subsection{Results and per-class analysis} \label{subsec:supresults}
+
+One detail of the protocol has to be stated before the numbers. The threshold is
+chosen on DS1, as always, but a supervised model is far too confident about beats
+it trained on, so a threshold picked from those scores would be badly wrong on new
+data. Each DS1 beat is therefore scored by the folds that did \emph{not} train on
+it, and the threshold is chosen from those scores instead.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{The two supervised models on DS2, with the best label-free method of
+  \Cref{tab:unsupresults} as a reference line. The complete table of every method
+  is \Cref{tab:final}.}
+  \label{tab:supresults}
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    \textbf{Method} & \textbf{Precision} & \textbf{Recall} & \textbf{F1}
+      & \textbf{ROC AUC} \\
+    \midrule
+    Random Forest        & \textbf{0.837} & 0.633 & \textbf{0.721} & \textbf{0.948} \\
+    XGBoost              & 0.686 & \textbf{0.677} & 0.681 & 0.940 \\
+    \midrule
+    Isolation Forest (best label-free) & 0.343 & 0.566 & 0.427 & 0.836 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The jump over the same features is large, and it is the central measurement of
+this report; Section~\ref{subsec:supervision-buys} reads it in detail.
+
+The two supervised models split the difference between the two errors rather than
+one being better than the other. Random Forest is the more cautious: it speaks
+less often and is right more often when it does. XGBoost catches more abnormal
+beats but raises more false alarms. Which is preferable is a clinical decision,
+not a statistical one. In screening, where a missed beat is worse than a wasted
+look, XGBoost's higher recall would probably win despite its lower F1.
+
+The AUC of \num{0.948} is the highest number in the report, and it still sits well
+above the F1 of \num{0.721}: even here, the ranking is better than the single cut
+through it.
+
+Finally, the errors are not spread evenly across the classes, and this is
+developed in Section~\ref{sec:results}. Ventricular beats are found almost every
+time, since they differ in both rhythm and shape and the model has both. Fusion
+beats are rarer and sit between the two, so they are harder. Supraventricular
+beats are the real ceiling: they keep a normal shape, so the only clue is timing,
+and \Cref{fig:shapimp} shows the model leaning on exactly that. It is using the
+one signal available and still missing them.
+
+
+
+
+\section{Deep Learning: Autoencoders} \label{sec:deep}
+
+The methods so far read numbers computed by hand. This section removes that step
+and lets a neural network read the beat itself. The labels are put away again: as
+in Section~\ref{sec:features}, nothing tells the model which beats are abnormal.
+
+\subsection{Principle: reconstruction error as an anomaly score}
+\label{subsec:aeprinciple}
+
+An autoencoder is asked to give back exactly what it was given. On its own that is
+a pointless task, since copying the input would solve it. The trick is the
+bottleneck: between the input and the output, the whole window is squeezed into
+sixteen numbers. Two hundred and thirty-four samples cannot pass through sixteen
+numbers unchanged, so the model has no choice but to learn what a beat generally
+looks like and rebuild it from that summary~\cite{hinton2006reducing}.
+
+The model is then trained on normal beats only. It becomes good at rebuilding
+normal beats and has never had reason to learn anything else. Feeding it an
+abnormal beat, the reconstruction comes back wrong, and how wrong it is becomes
+the anomaly score~\cite{sakurada2014autoencoder}. High error means the beat does
+not look like anything the model learned.
+
+The threshold follows the same logic, and needs no anomaly label at all. The error
+is measured on normal beats from five records held out of training, and the
+threshold is set at a high percentile of those errors. In other words: accept that
+a small share of normal beats will be flagged, and call anything above that line
+an anomaly. Holding out whole records rather than random beats is the same
+precaution as the DS1/DS2 split, applied inside the training half.
+
+One reference point was fixed before any training. The laziest possible model
+answers the average training window whatever it is shown. Its error is computed
+first, and any autoencoder that does not clearly beat it has learned nothing,
+whatever its scores look like afterwards.
+
+\subsection{Convolutional autoencoder} \label{subsec:cnnae}
+
+The first model reads the short beat window, the same 234 samples used everywhere
+else in this report. Three convolutions slide small filters along the signal, each
+halving its length, so the model looks first at fine detail and then at the
+overall shape. A linear layer squeezes the result into sixteen numbers, and the
+decoder walks the same path backwards, stretching the signal out and smoothing it
+with convolutions until the original length is recovered.
+
+One choice is worth noting. The decoder stretches the signal and then filters it,
+rather than using a transposed convolution. The two do the same job, but the
+lengths are far easier to follow this way, and the length has to come out exactly
+right at the end.
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.78\textwidth]{autoencoders/figures/cnn_reconstructions.png}
+  \caption{Four beats and what the trained model gives back. The normal beat is
+  rebuilt almost perfectly. The supraventricular beat has the highest error of
+  the four, but the reconstruction still follows it closely. The ventricular and
+  fusion beats come back with errors as low as the normal one: their shapes are
+  smooth and slow, which the model finds easy to rebuild even though it never
+  learned them. This is the weakness the section ends on.}
+  \label{fig:cnnrecon}
+\end{figure}
+
+
+\subsection{Recurrent autoencoder} \label{subsec:lstmae}
+
+The convolutional model sees one beat and nothing around it, so it can never
+notice a beat arriving too early. The second model is built to fix that. Its
+window is two seconds wide, centred on the same R-peak, so the beat before and the
+beat after are inside it. An LSTM then walks along the window step by step, keeping
+a memory of what it has seen, which lets it use the distance between beats and not
+only their shape.
+
+The window is decimated by six before being read. Since the filter of
+Section~\ref{subsec:preprocessing} keeps nothing above \SI{10}{\hertz}, keeping
+one sample in six loses no real information and makes the sequence six times
+shorter, which an LSTM badly needs.
+
+The first version of this model did not work. It settled at a reconstruction error
+of about \num{0.95}, which on a signal of variance one is what a flat line scores:
+the model had given up and was answering nothing at all. Two changes were needed.
+
+First, the encoder reads the window in both directions. Reading forwards only, the
+summary of the window is the memory state after 120 steps, so anything that
+happened at the start has to survive all 120 of them, and it does not.
+
+Second, the decoder is given sines and cosines of its position in the window
+instead of a single ramp from 0 to 1. A ramp tells the decoder where it is, but it
+must then invent every oscillation of the ECG on its own. With a set of waves
+supplied, it only has to combine them. This single change is what moved the model
+off the flat line.
+
+\subsection{Training and convergence} \label{subsec:training}
+
+Both models are trained the same way: the Adam optimiser, batches of 256, mean
+squared error as the loss, and a budget of at most 30 passes over the data for the
+convolutional model and 40 for the recurrent one. Training stops
+early when the validation error has not improved for five passes, and the weights
+kept are those of the best pass, not the last one. Gradients are capped in size,
+which an LSTM needs, since a single huge gradient can destroy the weights in one
+step, and which costs the convolutional model nothing.
+
+The two training curves could hardly be more different (\Cref{fig:aecurves}).
+
+\begin{figure}[htbp]
+  \centering
+  \begin{subfigure}{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{autoencoders/figures/cnn_training_curve.png}
+    \caption{Convolutional autoencoder}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{autoencoders/figures/lstm_training_curve.png}
+    \caption{Recurrent autoencoder}
+  \end{subfigure}
+  \caption{Training and validation error against the number of passes over the
+  data. The convolutional model drops to almost zero within two passes and the
+  two curves stay together, which is healthy. The recurrent model improves far
+  more slowly and its two curves separate: the training error keeps falling while
+  the validation error flattens out around \num{0.32}. It is learning the
+  training patients rather than what a normal window looks like in general.}
+  \label{fig:aecurves}
+\end{figure}
+
+
+The gap between the two curves on the right is the classic sign of a model
+memorising its training data, and it is not surprising: a two-second window
+contains a patient's own rhythm, which is highly personal, so there is a great
+deal there to memorise.
+
+\subsection{Results} \label{subsec:aeresults}
+
+\Cref{tab:aeresults} places both models among the others.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{The two autoencoders on DS2, with the best label-free method and the
+  best supervised model as reference lines. The last row is the same convolutional
+  model trained on all beats instead of normal ones only. The complete table of
+  every method is \Cref{tab:final}.}
+  \label{tab:aeresults}
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    \textbf{Method} & \textbf{Precision} & \textbf{Recall} & \textbf{F1}
+      & \textbf{ROC AUC} \\
+    \midrule
+    1D CNN autoencoder   & 0.349 & 0.669 & \textbf{0.459} & 0.839 \\
+    LSTM autoencoder     & 0.308 & 0.426 & 0.357 & \textbf{0.840} \\
+    CNN AE (all beats)   & 0.147 & 0.205 & 0.171 & 0.708 \\
+    \midrule
+    Isolation Forest (best label-free) & 0.343 & 0.566 & 0.427 & 0.836 \\
+    Random Forest (best supervised)    & 0.837 & 0.633 & 0.721 & 0.948 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The convolutional model becomes the best label-free method, at F1 \num{0.459}
+against \num{0.427} for Isolation Forest. The gain is real but small, and it came
+at a much higher price: a neural network trained over many passes, against a
+forest of random cuts fitted in seconds. Reading the raw beat instead of 35
+hand-made numbers bought \num{0.032} of F1.
+
+The third row is the most instructive experiment in the section. The
+same model, trained on \emph{all} beats rather than normal ones only, collapses to
+F1 \num{0.171}, below the random baseline. Shown abnormal beats during training,
+the model learns to rebuild those too, and the reconstruction error stops
+separating anything. Training on normal data alone is not a detail of the recipe,
+it is the entire mechanism.
+
+The recurrent model, despite all the work it took, finishes below Isolation
+Forest at F1 \num{0.357}. But its AUC of \num{0.840} is the highest of the
+label-free methods, marginally above the convolutional model's \num{0.839}. The
+two numbers disagree because the errors of its normal beats are spread widely, as
+the training curve already suggested. The extra context of a two-second window did
+help the ranking. It did not survive the threshold.
+
+\Cref{fig:cnnerror} shows where the remaining difficulty lies.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.7\textwidth]{autoencoders/figures/cnn_error_distribution.png}
+  \caption{Reconstruction error of normal and abnormal beats of DS2, on a
+  logarithmic scale. The two groups sit in different places, which is why the
+  method works at all, but they overlap heavily. Any vertical line drawn through
+  this picture either misses many abnormal beats on its right or flags many
+  normal ones on its left.}
+  \label{fig:cnnerror}
+\end{figure}
+
+
+The overlap is not a threshold problem to be tuned away. It says that a sizeable
+share of abnormal beats are genuinely easy to rebuild, which
+\Cref{fig:cnnsignal} makes concrete.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.78\textwidth]{autoencoders/figures/cnn_signal_overlay.png}
+  \caption{Ten seconds of record 232. Above, the recording in grey with the
+  reconstruction in red and the true abnormal beats marked. Below, the error at
+  each sample with the threshold as a dashed line. The reconstruction follows the
+  signal closely nearly everywhere, abnormal beats included, so most of the red
+  markers sit on beats whose error never rises above the line.}
+  \label{fig:cnnsignal}
+\end{figure}
+
+
+The reason is visible in \Cref{fig:cnnrecon}. A ventricular beat is wide and
+smooth. A smooth curve is exactly what convolutions and a squeezed representation
+rebuild most easily, so an abnormal beat can be \emph{easier} to reconstruct than
+a normal one, and the score points the wrong way. The method assumes that unusual
+implies hard to rebuild, and on this signal that assumption is only partly true.
+
+Two conclusions close the section. Deep learning did win among the label-free
+methods, but by a margin that does not justify its cost here; a forest of random
+cuts on hand-made features gets within \num{0.032} of it for a tiny fraction of
+the computation. And the deepest model in this report still sits nearly
+\num{0.26} of F1 below a Random Forest given the labels. The shortage in this
+problem is supervision, not model capacity, which is the point
+Section~\ref{sec:results} takes up.
+
+
+
+\section{Software Contributions} \label{sec:software}
+
+A result that cannot be reproduced is an anecdote. This section describes what was
+built so that every number in this report can be obtained again, by someone else,
+on another machine, after the internship has ended.
+
+\subsection{Package architecture} \label{subsec:architecture}
+
+The code is a proper installable Python package, not a folder of scripts. Twelve
+modules hold about \num{1000} lines, each with one job
+(\Cref{tab:modules}).
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{The modules of the package and what each one does.}
+  \label{tab:modules}
+  \begin{tabular}{@{}llp{0.42\textwidth}@{}}
+    \toprule
+    \textbf{Module} & \textbf{Lines} & \textbf{Responsibility} \\
+    \midrule
+    \texttt{data.py}          & 29  & Downloads the database and reads one record \\
+    \texttt{splits.py}        & 29  & DS1/DS2 lists, AAMI mapping, leakage checks \\
+    \texttt{preprocessing.py} & 65  & Filtering and normalisation \\
+    \texttt{beats.py}         & 109 & Cuts the signal into beat windows \\
+    \texttt{detectors.py}     & 55  & Z-score and CUSUM \\
+    \texttt{spectral.py}      & 74  & Fourier transform and its six descriptors \\
+    \texttt{features.py}      & 96  & Rhythm and morphological features \\
+    \texttt{wavelets.py}      & 70  & Discrete and continuous wavelet features \\
+    \texttt{unsupervised.py}  & 87  & Feature matrix, Isolation Forest, one-class SVM \\
+    \texttt{supervised.py}    & 101 & Random Forest, XGBoost, SHAP \\
+    \texttt{autoencoders.py}  & 368 & Both neural models, training, scoring \\
+    \texttt{evaluation.py}    & 86  & Metrics, threshold choice, result tables \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The dependencies run one way only: \texttt{evaluation.py} and \texttt{splits.py}
+know nothing about the models, while every model imports them. That is what makes
+the comparison of Section~\ref{sec:results} trustworthy. There is exactly one
+piece of code that computes an F1 score and exactly one that chooses a threshold,
+so no method can be measured on slightly different terms from another.
+
+The package installs with \texttt{pip install -e .} and declares its own
+dependencies. PyTorch sits behind an optional \texttt{deep} extra, so anyone
+interested only in the classical methods does not have to install it.
+
+\subsection{Notebooks and reproducible workflow} \label{subsec:notebooks}
+
+Six notebooks run the experiments, one per stage of the work: exploration,
+statistical baselines, features and label-free models, supervised models, the
+convolutional autoencoder, and the recurrent one.
+
+The division of labour between notebook and package is strict. Every function
+lives in the package; the notebooks call them, draw figures and save tables. No
+notebook defines a model or a feature. This matters for two reasons: a function in
+a notebook cannot be tested, and a notebook run out of order silently produces
+results that depend on the order the cells happened to be executed in.
+
+Each notebook writes its output into its own results folder, as a CSV table, a
+Markdown table and figures. Every table in this report is copied from those files
+rather than typed by hand, which removes a whole class of transcription error.
+
+The data never enters the repository. A single function downloads the recordings
+on demand, retrying a few times, since the PhysioNet server occasionally times
+out. The \SI{650}{\mega\byte} of signals stay outside Git and outside the
+container image.
+
+\subsection{Containerisation} \label{subsec:container}
+
+The image is built on a slim Python 3.11 base and holds the package, the tests and
+the notebooks, with JupyterLab starting automatically. Four choices are worth
+explaining.
+
+PyTorch is installed from the CPU-only index. The default build pulls roughly
+\SI{2.5}{\giga\byte} of GPU libraries that no machine used in this work could
+exercise.
+
+The container does not run as root. A user named \texttt{researcher} is created
+and given ownership of the working directory, since without that ownership the
+notebooks could not write a single figure.
+
+The data and the results are mounted from outside rather than copied in. The
+recordings would make the image unusable, and results written inside a container
+disappear when it stops. Mounting them means the image holds only code, and the
+same image works for anyone with their own copy of the data.
+
+A compose file records the whole invocation, so starting the environment is one
+command instead of a long line of options that has to be remembered correctly.
+
+\subsection{Continuous integration} \label{subsec:ci}
+
+Two automated workflows run on GitHub.
+
+The first runs on every push and every pull request. It installs the package from
+scratch, downloads a single record, and runs the test suite. Downloading one
+record rather than all 48 is deliberate: it keeps the check under a minute while
+still exercising the real reading and parsing code, rather than a mock that could
+drift away from the real thing.
+
+The second builds the container image and publishes it to the GitHub registry when
+a version tag is pushed. A published image is a far stronger reproducibility
+guarantee than a list of dependencies, since it fixes the exact versions that
+produced the results.
+
+The effect on the way the work was done is worth stating. Because the first
+workflow runs on every pull request, no stage could be merged while the tests were
+failing, and the checks guarding the DS1/DS2 split (Section~\ref{subsec:split})
+therefore ran on every single change. A leak between training and test data could
+not survive a single commit unnoticed.
+
+
+
+
+\section{Verification} \label{sec:verification}
+
+Validation, in Section~\ref{sec:validation}, asks whether the results say something
+true about heartbeats. Verification asks the narrower question first: does the code
+compute what this report claims it computes? A wrong number produced by correct
+reasoning is still wrong, and the only defence is to check the machinery itself.
+
+\subsection{Test strategy: unit tests, toy cases, invariants}
+\label{subsec:teststrategy}
+
+The package carries 64 tests spread over six files, one per module. They are not
+regression tests: none of them checks that a function still returns the number it
+returned yesterday. Each one states a property that must hold whatever the data,
+and three kinds of property are used.
+
+\paragraph{Shape and structure.} The cheapest and most frequently violated
+promises. One row of features per beat, one score per window, no missing value in
+the feature matrix, the meta columns dropped from the model input. These catch the
+off-by-one errors that would otherwise silently misalign a whole record.
+
+\paragraph{Mathematical identities.} Properties that follow from the definitions
+and can be checked exactly. The five wavelet energy ratios must sum to one, since
+the transform conserves energy. A perfectly regular rhythm must give a flat set of
+rhythm features. A symmetric signal must have zero skewness, and Gaussian noise
+near-zero excess kurtosis. A constant signal must give the right root mean square.
+If any of these fails, the formula is wrong, not the data.
+
+\paragraph{Behaviour on toy cases.} The most useful family. A small artificial
+record is built with one beat per second, and selected beats are made deliberately
+wider, as a ventricular beat is. Every detector is then required to give those
+beats a higher score than the rest. Isolation Forest must score points far from the
+crowd above points inside it; the one-class SVM the same; a Random Forest must
+separate two clearly distinct classes; an autoencoder trained on narrow beats must
+score wide ones higher. These tests do not check accuracy, they check the sign of
+the answer, which is what a silent bug destroys first.
+
+Two further points are worth stating. Every test that involves randomness is run
+twice with the same seed and the outputs compared, so reproducibility is itself
+tested rather than assumed. And the deep learning tests are skipped rather than
+failed when PyTorch is absent, so the classical half of the package remains
+testable in a minimal environment.
+
+The evaluation module deserves a word of its own, since an error there would
+corrupt the whole comparison while leaving each model apparently intact. The
+threshold routine is checked against its own definition: cutting the scores at a
+given percentile must leave the expected share of points above the line. The four
+raw counts are stored beside every reported score, so precision and recall can be
+recomputed by hand at any time. And the strongest check there is structural rather
+than numerical: because the metrics live in a single module imported by every
+notebook, a mistake in them would move all the methods in the same direction and
+leave the ranking intact, and the ranking is what this report concludes from.
+
+\subsection{Convergence of the training loss} \label{subsec:convergence}
+
+For the two neural models, the training curve is itself a check: a model that has
+not converged produces scores that mean nothing, whatever they look like.
+
+Three guards are in place. Training stops when the validation error has not
+improved for five passes, and the weights kept are those of the best pass rather
+than the last. A test verifies that training actually lowers the loss on a simple
+case. And a test requires the recurrent model to beat the flat-line answer, which
+is the specific failure it exhibited before the changes of
+Section~\ref{subsec:lstmae}: a mean squared error near \num{0.95} on a signal of
+variance one means the model is predicting nothing at all.
+
+\Cref{tab:convergence} gives what the two models actually did.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Convergence of the two autoencoders.}
+  \label{tab:convergence}
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    \textbf{Model} & \textbf{Passes} & \textbf{Final train} & \textbf{Best val}
+      & \textbf{Time} \\
+    \midrule
+    Convolutional & 29 of 30 & \num{0.00034} & \num{0.00073} & \SI{390}{\second} \\
+    Recurrent     & 36 of 40 & \num{0.078}   & \num{0.315}   & \SI{17.2}{\minute} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The two rows tell opposite stories. The convolutional model's training and
+validation errors stay within a factor of about two of each other and both fall to
+near zero: it has learned the shape of a normal beat and the lesson transfers to
+patients it never saw. The recurrent model ends with a validation error four times
+its training error, and the validation curve flattens near \num{0.32} while the
+training error keeps falling. That gap is memorisation of the training patients,
+and it is reported here rather than hidden because it is the reason the recurrent
+model's threshold behaves badly in Section~\ref{subsec:aeresults}.
+
+Both models stopped early, so neither ran out of budget while still improving.
+
+\subsection{Reproducibility} \label{subsec:reproducibility}
+
+Section~\ref{sec:software} described the machinery: the pinned environment, the
+published container image, the data fetched from PhysioNet rather than shipped,
+and every figure and table written to a results folder by the notebook that
+produced it. One measure belongs here rather than there. Every source of randomness
+takes a fixed seed, and two tests fit the same model twice with the same seed and
+require identical scores, so reproducibility is checked rather than asserted. Every
+notebook is also traceable to the files it wrote, which the repository documents.
+
+Two gaps should be stated plainly. The container image digest is not recorded in
+this report, so reproducibility is guaranteed at the level of a version tag rather
+than an exact image. And no checksum of the downloaded recordings is stored, so a
+silent change at the source would not be detected automatically. Both are recorded
+in Section~\ref{subsec:debt} as technical debt.
+
+\subsection{Ablations} \label{subsec:ablations}
+
+Several settings were varied deliberately, and the failures are more informative
+than the successes.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{What each ablation showed.}
+  \label{tab:ablations}
+  \begin{tabular}{@{}p{0.28\textwidth}p{0.28\textwidth}p{0.34\textwidth}@{}}
+    \toprule
+    \textbf{Setting varied} & \textbf{Values tried} & \textbf{What it showed} \\
+    \midrule
+    Z-score window
+      & \SI{1}{\second}, \SI{10}{\second}
+      & The short window scores below chance (AUC \num{0.274}): a bad scale
+        reverses a detector rather than merely weakening it \\
+    \addlinespace
+    CUSUM allowance $k$
+      & 0.25, 0.5, 1.0, 2.0
+      & Small $k$ accumulates on noise, large $k$ misses real drift; 0.5 kept \\
+    \addlinespace
+    Autoencoder training set
+      & Normal beats only vs.\ all beats
+      & F1 collapses from \num{0.459} to \num{0.171}, below chance. Training on
+        normal data alone is the mechanism, not a detail \\
+    \addlinespace
+    LSTM encoder direction
+      & One direction vs.\ both
+      & One direction leaves the model stuck at the flat-line answer \\
+    \addlinespace
+    LSTM decoder position signal
+      & Ramp vs.\ sines and cosines
+      & The ramp alone does not lift the model off the flat line \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The third row deserves emphasis. It is the one experiment in this report that turns
+a plausible assumption into a measured fact, and it does so by breaking the method
+on purpose.
+
+
+\section{Validation} \label{sec:validation}
+
+Section~\ref{sec:verification} established that the code computes what it claims.
+This section asks the harder question: does what it computes say anything true
+about heartbeats?
+
+\subsection{Comparison with published results on the same protocol}
+\label{subsec:published}
+
+The comparison must be made carefully, because this work and the literature do not
+answer the same question. Published systems assign each beat to one of the five
+AAMI classes; the systems here answer normal or abnormal. A five-class score cannot
+be set beside a two-class score directly, and pretending otherwise would be the
+kind of comparison Section~\ref{subsec:sota} criticises.
+
+Two things can nevertheless be checked.
+
+\paragraph{The split is the right one.} The composition of DS2 reported in the
+literature is \num{44258} normal beats, \num{1837} supraventricular, \num{3221}
+ventricular, \num{388} fusion and \num{7} unclassifiable, giving an anomaly rate
+of \num{0.1097}~\cite{dechazal2004}. The pipeline built here records exactly
+\num{0.1097} on its own DS2. Reproducing an independently published figure to four
+decimal places is strong evidence that the records, the paced-record exclusions and
+the AAMI mapping have all been implemented as intended.
+
+\paragraph{The difficulty is where the literature says it is.} Published results
+under this protocol agree on one point across two decades. In the original work of
+de Chazal et al.~\cite{dechazal2004}, ventricular beats were detected with a
+sensitivity of \SI{67.3}{\percent} and supraventricular beats with only
+\SI{53.3}{\percent}, while fusion and unclassifiable beats fared worse still. The
+survey of Luz et al.~\cite{luz2016survey}, reviewing the methods published in the
+decade that followed, reports the same ordering across the whole literature:
+whatever the model, ventricular beats are recognised well and supraventricular
+beats are not. Later work has narrowed the gap without closing it, and the
+supraventricular class remains the weak point of every system evaluated under
+this split.
+
+That ordering is exactly what the analysis of Section~\ref{sec:supervised}
+predicts from the features. Ventricular beats differ in both rhythm and shape;
+supraventricular beats differ only in timing. A method that finds the second as
+easily as the first would be suspicious rather than impressive.
+
+Two comparisons are therefore avoided in this report. No score here is placed
+beside a published five-class score. And no score here is placed beside a result
+obtained without the inter-patient split, since those numbers are much higher and
+measure a different thing~\cite{luz2016survey}.
+
+\subsection{Clinical relevance of the errors} \label{subsec:clinical}
+
+A single F1 hides the fact that the two kinds of error cost very different things.
+
+A false alarm costs a physician a few seconds: the beat is displayed, glanced at
+and dismissed. A missed beat costs the patient. The two are not symmetric, and F1
+treats them as though they were. This is why Section~\ref{subsec:supresults}
+declines to declare Random Forest better than XGBoost: the forest is more precise,
+the boosting catches more, and which is preferable is a clinical judgement.
+
+Whether a missed beat matters also depends on which beat is missed. A ventricular
+beat carries more immediate clinical weight than a fusion beat, and a single
+isolated abnormal beat matters less than a run of them. None of the methods here
+distinguishes these cases, because all of them decide beat by beat with no memory
+of what came before. A system reporting ``one odd beat in this minute'' and one
+reporting ``forty odd beats in a row'' would receive identical treatment.
+
+Two limits of the evaluation follow, and both make the reported figures optimistic
+rather than pessimistic. The R-peak positions come from the annotations, so no
+error made while finding the beats is counted. And the beats are judged
+independently, so no credit or penalty attaches to catching a run of abnormal beats
+rather than scattered ones.
+
+\subsection{Domain of validity and limits} \label{subsec:validity}
+
+The results of this report are valid under conditions that should be stated as
+narrowly as they hold.
+
+\paragraph{Where they hold.} On beat windows cut around R-peak positions that are
+already known to be correct; on recordings from the MIT-BIH database, filtered and
+normalised as in Section~\ref{subsec:preprocessing}; on adult patients without
+pacemakers; on the first lead only; and with a threshold chosen once on DS1 and
+applied unchanged to every patient in DS2.
+
+\paragraph{Where they do not.} Nothing here has been tested on a patient with a
+pacemaker, since those four records were excluded by design. Nothing has been
+tested on a second lead, on modern recording equipment, or on any database other
+than this one. No beat detector has been run, so a complete system would perform
+worse than these numbers suggest. And no claim is made about which arrhythmia a
+flagged beat represents: the output is a flag, not a diagnosis.
+
+\paragraph{What the work does support.} Within those limits, three conclusions
+survive, and they are stated in Section~\ref{subsec:contributions}. None of them
+depends on the exact scores: all three depend on the ranking, and the ranking is
+what the shared protocol of Section~\ref{sec:evaluation} was built to protect.
+
+\subsection{How much the numbers could move} \label{subsec:limits-numbers}
+
+Every score in this report is a single value, and it is worth saying plainly how
+firm those values are. The test set holds 22 patients. That is the real sample
+size, not the \num{49692} beats, because beats from one patient resemble each
+other far too closely to count as separate observations. With 22 patients, a
+difference of a few points may say nothing more than which patients happened to
+fall on which side of the split.
+
+The per-class results make the same point from another direction. Ventricular
+beats are caught by the supervised models at a recall near \num{0.95}, while
+supraventricular beats sit near \num{0.16} and fusion beats near \num{0.28}. An
+overall F1 is therefore dominated by the V class, and a method that scored slightly
+better overall might simply have met a test group with more V beats in it.
+
+Two consequences follow, and they are applied throughout this report. Large gaps
+are treated as real: the \num{0.294} of F1 that supervision adds over the same
+features, and the collapse measured in \Cref{tab:ablations} when the autoencoder is
+trained on all beats rather than normal ones only, are far too big to come from
+patient sampling. Small gaps are not: the \num{0.032} separating the convolutional
+autoencoder from Isolation Forest is within the range that 22 patients could
+produce by chance, so the fair statement is that those two methods perform
+comparably, and the neural one costs far more computation to do so.
+
+This is why Section~\ref{subsec:deliverables} set the objective as a trustworthy
+ranking rather than a target score. The ranking holds where the gaps are wide, and
+this report claims nothing where they are narrow.
+
+
+
+\section{Results and Discussion} \label{sec:results}
+
+The previous sections reported each family of methods on its own terms. This one
+puts them side by side and asks what the comparison actually taught.
+
+\subsection{Overall comparison} \label{subsec:overall}
+
+\Cref{tab:final} collects every method on the same test set, the same beats, the
+same metrics and the same threshold rule.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{All methods on DS2. Best value in each column in bold.}
+  \label{tab:final}
+  \begin{tabular}{@{}llrrrr@{}}
+    \toprule
+    \textbf{Method} & \textbf{Labels} & \textbf{Prec.} & \textbf{Rec.}
+      & \textbf{F1} & \textbf{AUC} \\
+    \midrule
+    Random Forest        & yes & \textbf{0.837} & 0.633 & \textbf{0.721} & \textbf{0.948} \\
+    XGBoost              & yes & 0.686 & \textbf{0.677} & 0.681 & 0.940 \\
+    1D CNN autoencoder   & no  & 0.349 & 0.669 & 0.459 & 0.839 \\
+    Isolation Forest     & no  & 0.343 & 0.566 & 0.427 & 0.836 \\
+    Spectral features    & no  & 0.297 & 0.502 & 0.373 & 0.773 \\
+    CUSUM ($k=0.5$)      & no  & 0.410 & 0.335 & 0.369 & 0.680 \\
+    LSTM autoencoder     & no  & 0.308 & 0.426 & 0.357 & 0.840 \\
+    Z-score (\SI{10}{\second}) & no & 0.652 & 0.175 & 0.276 & 0.615 \\
+    One-Class SVM        & no  & 0.200 & 0.437 & 0.275 & 0.687 \\
+    Random baseline      & --  & 0.110 & 0.996 & 0.198 & 0.500 \\
+    Z-score (\SI{1}{\second}) & no & 0.110 & 0.997 & 0.198 & 0.274 \\
+    CNN AE (all beats)   & no  & 0.147 & 0.205 & 0.171 & 0.708 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Three things stand out. The two supervised models are clearly ahead and no
+label-free method comes close on F1. Among the label-free methods the ordering is
+tight: the convolutional autoencoder, Isolation Forest and the recurrent
+autoencoder are separated by about a tenth of F1 (\num{0.459} to \num{0.357}),
+and their AUCs are within
+\num{0.004} of each other. And the ordering by F1 is not the ordering by AUC: the
+recurrent autoencoder has the best label-free ranking (\num{0.840}) while sitting
+seventh on F1, because a single threshold serves its scores badly.
+
+Cost does not follow the ranking either. All timings are on a laptop CPU with no
+GPU: Isolation Forest reaches its F1 of \num{0.427} in seconds, the convolutional
+autoencoder reaches \num{0.459} in \SI{390}{\second}, and the recurrent
+autoencoder reaches \num{0.357} in \SI{17.2}{\minute}. Cost and accuracy do not
+move together in this problem, which is the main practical lesson of the
+internship.
+
+\subsection{What supervision actually buys} \label{subsec:supervision-buys}
+
+The clean experiment of this internship is the pair Isolation Forest and Random
+Forest. They read the same 35 numbers, on the same beats, under the same split. The
+only difference is that one is told the answers during training.
+
+That difference is worth \num{0.294} of F1, from \num{0.427} to \num{0.721}. For
+comparison, replacing one hand-picked number with 35 engineered features bought
+\num{0.054}, and reading the raw signal with a neural network bought \num{0.032}
+more. Supervision is worth roughly five times what all the feature work is worth
+put together.
+
+But the gain is lopsided, and the shape of it is the more interesting result.
+Precision rises from \num{0.343} to \num{0.837}, while recall rises only from
+\num{0.566} to \num{0.633}. Labels do not teach the model to see more; they teach
+it to speak less often and be right when it does. An anomaly detector flags
+everything unusual, and most unusual beats are not abnormal ones. Told what an
+abnormal beat looks like, the model stops flagging the merely odd.
+
+This has a direct practical reading. If the goal is to reduce the physician's
+workload, labels are indispensable. If the goal is to miss as few abnormal beats as
+possible, they buy much less, and a label-free method costing seconds is not far
+behind.
+
+\subsection{The S-class ceiling} \label{subsec:sclass}
+
+The overall figures conceal a reversal that only per-class numbers reveal
+(\Cref{tab:perclass}).
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \caption{Recall per AAMI class on DS2. Q is omitted: only 7 such beats survive
+  the exclusion of the paced records, too few to mean anything.}
+  \label{tab:perclass}
+  \begin{tabular}{@{}llrrr@{}}
+    \toprule
+    \textbf{Method} & \textbf{Labels} & \textbf{S} & \textbf{V} & \textbf{F} \\
+    \midrule
+    Random Forest      & yes & 0.161 & \textbf{0.946} & 0.281 \\
+    XGBoost            & yes & 0.275 & \textbf{0.946} & \textbf{0.351} \\
+    1D CNN autoencoder & no  & \textbf{0.654} & 0.750 & 0.064 \\
+    LSTM autoencoder   & no  & 0.484 & 0.441 & 0.018 \\
+    Isolation Forest   & no  & 0.380 & 0.717 & 0.106 \\
+    One-Class SVM      & no  & 0.380 & 0.513 & 0.126 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+The V column explains the overall ranking: ventricular beats are the largest
+abnormal class, the supervised models catch \SI{95}{\percent} of them, and that
+alone carries most of the F1 gap. Nothing surprising there.
+
+The S column is the surprise. The best supervised model catches \num{0.161} of the
+supraventricular beats. The convolutional autoencoder, which was never shown a
+single label, catches \num{0.654} of them: four times as many.
+
+The explanation is that the two families are trained to do different things. A
+supervised model minimises its error over a set in which nine beats in ten are
+normal and supraventricular beats are one in forty. Ignoring the S class costs it
+almost nothing in total error, so it learns to ignore it. That is not a flaw in the
+model; it is the model doing exactly what it was asked. An autoencoder is never
+asked to be accurate overall. It is asked only what a normal beat looks like, and
+anything that does not fit is flagged. A supraventricular beat, arriving early and
+disturbing the rhythm, does not fit.
+
+Two conclusions follow. First, that the ``S-class ceiling'' reported across the
+literature (Section~\ref{subsec:published}) is at least partly a consequence of
+optimising a single overall score under heavy imbalance, not only a consequence of
+S beats looking normal. Second, and more usefully, that the two families fail on
+different beats. The two autoencoders alone disagree on thousands of beats, and
+taking either flag rather than both raises recall to \num{0.726}, above what either
+achieves alone. Combining a supervised model for precision with a label-free one
+for coverage of the rare classes is the most promising direction this work points
+to, and Section~\ref{subsec:perspectives} returns to it.
+
+The F column should not be passed over. Every method is poor on fusion beats, and
+the autoencoders are worst of all, at \num{0.064} and \num{0.018}. A fusion beat is
+by definition a blend of a normal and a ventricular beat, so it sits halfway
+between what the model learned and what it did not. Reconstruction error, which
+measures distance from normal, is close to blind to it.
+
+
+
+\section{Conclusion} \label{sec:conclusion}
+
+\subsection{Contributions} \label{subsec:contributions}
+
+This internship set out to answer one question: can a machine find abnormal
+heartbeats on its own, and what does it cost to help it? Four contributions answer
+it.
+
+The first is a complete and reproducible chain from a raw half-hour recording to a
+decision on every single beat, built as an installable package rather than a set of
+scripts, covered by 64 property-based tests, checked automatically on every change,
+and shipped as a container image. The software is a result of this work, not
+scaffolding for it: without it, none of the numbers below could be produced again.
+
+The second is a fixed measuring protocol, decided before any model was written and
+reused unchanged by every method. Records are split by patient, the threshold is
+chosen only on the training half, and one module computes every score. This is what
+makes the comparison meaningful, and it was the single most consequential decision
+of the internship. The composition of the test set reproduces the published figure
+exactly (Section~\ref{subsec:published}), which confirms the split was implemented
+as intended.
+
+The third is the comparison itself, spanning three statistical baselines, two
+label-free models on engineered features, two supervised models and two neural
+networks, all measured identically. Its central finding is that supervision is
+worth about five times what all the feature engineering is worth put together, and
+that what it buys is precision rather than coverage: the model learns to stop
+flagging beats that are merely unusual, not to see beats it was previously missing.
+
+The fourth is the per-class analysis, and it is the finding that would not have
+appeared without the discipline of the first three. Supraventricular beats, the
+class the literature has struggled with for twenty years, are caught four times
+better by an autoencoder that never saw a label than by the best supervised model.
+The reason is not that the autoencoder is stronger, but that a model minimising
+overall error under a nine-to-one imbalance learns that ignoring a rare class costs
+it almost nothing. The two families of method therefore fail on different beats,
+which is a more useful result than either score alone.
+
+\subsection{Limitations and technical debt} \label{subsec:debt}
+
+Four limits concern what the results mean.
+
+The beats are given, not found. Every score in this report assumes the R-peak
+positions are already correct, because they come from the annotations. A complete
+system would have to find them and would perform worse than reported here.
+
+One database, one lead, one patient group. Forty-eight recordings from the 1970s,
+first lead only, no pacemaker patients, and nothing tested on any other data.
+
+Fusion beats defeat every method, and the autoencoders most of all. A beat that
+sits halfway between normal and abnormal is nearly invisible to a score that
+measures distance from normal.
+
+The recurrent autoencoder memorises its training patients. Its validation error
+settles at four times its training error, which is why its ranking is good and its
+thresholded decisions are not.
+
+Four further items are technical debt in the software, recorded here so they are
+not rediscovered later.
+
+The container image digest is not stored, so reproducibility is guaranteed at the
+level of a version tag rather than an exact image. No checksum of the downloaded
+recordings is kept, so a silent change at the source would pass unnoticed. Per-beat
+scores are saved only for the two neural models, which is why the uncertainty of
+the classical methods could not be quantified without rerunning them. And the
+experiments still live in notebooks rather than in a single pipeline module, so
+running the whole benchmark end to end means executing six notebooks in order.
+
+\subsection{Personal assessment} \label{subsec:personal}
+
+Three things about the way this internship was run are worth recording, since
+they cost time and changed how I work.
+
+The first is that the protocol had to come before the models. My instinct at the
+start was to fit something and see what happened, and it took the reading of
+Section~\ref{subsec:sota} to understand that a score obtained without an
+inter-patient split simply does not answer the question. Writing the split, the
+metrics and the threshold rule first felt like a delay of several days; in the end
+it is the only reason the ten methods can be put in one table at all.
+
+The second is how much of the useful information came from things that did not
+work. The one-second Z-score scoring below chance, the one-class SVM losing to a
+baseline, the recurrent autoencoder answering a flat line for a whole training
+run: each of those took longer to diagnose than the successful runs took to
+produce, and each of them is reported here because the diagnosis is the result.
+Learning to check a model against a trivial baseline before believing its score
+is the habit I take away from this work.
+
+The third is the working method. One issue per task, one pull request per stage
+and tests running on every push were imposed at the start, and I understood their
+value only in the middle of the internship, when the checks guarding the DS1/DS2
+split caught a change that would otherwise have leaked training patients into the
+test set silently. Organising the work in stages that each end with something
+merged also made it possible to say, at any point, what was finished and what was
+not.
+
+What I would do differently is straightforward. I would save the per-beat scores
+of every method from the beginning rather than only for the neural models, since
+their absence is what prevented any quantitative statement about uncertainty
+(Section~\ref{subsec:limits-numbers}), and I would move the experiments out of the
+notebooks into a single pipeline module earlier, rather than leaving it as the
+technical debt described above.
+
+\subsection{Perspectives} \label{subsec:perspectives}
+
+The results point to one direction more strongly than any other, and to four
+smaller ones.
+
+\paragraph{Combine the two families.} This is the clearest lead. The supervised
+models are precise and blind to the rare classes; the label-free models are noisy
+and catch what the others miss. They fail on different beats, and taking the flag
+of either raises coverage above what either reaches alone. A system using a
+supervised model for its decisions and an anomaly detector to catch what that model
+was trained to ignore would address the S-class ceiling directly, rather than
+hoping a larger model will eventually close it.
+
+\paragraph{Close the pipeline.} Adding a beat detector, of the Pan and Tompkins
+family, would remove the strongest optimistic bias in this report and give figures
+a complete system could actually deliver.
+
+\paragraph{Test elsewhere.} Running the same protocol unchanged on a second
+annotated database would separate what the methods learned about heartbeats from
+what they learned about this particular collection of recordings.
+
+\paragraph{Choose the threshold for the task.} The gap between AUC and F1 found
+throughout this report says a single threshold serving 22 patients loses much of
+what the ranking knows. Adapting the threshold per patient, or setting it from the
+clinical cost of a missed beat rather than from F1, is cheap to try and would likely
+gain more than a larger model.
+
+\paragraph{Put numbers on the uncertainty.} With 22 test patients, small differences
+are not measurable, and this report states which of its claims that affects
+(Section~\ref{subsec:limits-numbers}). Resampling whole records to attach an
+interval to each score would make that judgement quantitative instead of
+argued.
+
+\paragraph{Carry it to vibration signals.} The internship was framed as defect
+detection, and the pipeline transfers as it stands: filter, cut into events,
+describe each event with numbers, score, threshold, and measure with a split that
+keeps machines apart, the inter-machine counterpart of the inter-patient split
+used here. The descriptors transfer with modification, spectral and wavelet
+features being if anything better suited to rotating machinery, where faults
+announce themselves as characteristic frequencies. Two things do not. The R-peak
+has no equivalent, so segmentation becomes a real and unsolved step rather than a
+free one; and a monitored machine is healthy almost all of the time, so anomalies
+would be far rarer than one beat in nine, which pushes further still toward the
+label-free half of this comparison.
+
+Beyond the cardiology, the transferable outcome is the method rather than the
+model: describe the signal, fix the protocol before fitting anything, compare
+everything on identical terms, and read the per-class results before believing the
+average. That discipline applies unchanged to a vibration signal from a bearing,
+where labels are far scarcer than they are here and the label-free half of this
+comparison would carry most of the weight.
+
+
+\section*{AI Assistance Declaration}
+\addcontentsline{toc}{section}{AI Assistance Declaration}
+
+Parts of this work were prepared with the help of Artificial Intelligence tools, in
+line with the CSMI policy on responsible AI use~\cite{csmitools}. The tools used,
+and what each of them was used for, are the following:
+
+\begin{itemize}
+  \item Claude (Anthropic, 2026)~\cite{anthropic_claude} for reformulating
+        sentences in this report, for help with the deep learning part of the
+        implementation, and for correcting code written earlier, and helped in docker.
+  \item ChatGPT (OpenAI, 2026)~\cite{openai_chatgpt} for explanations of algorithms
+        and for help with LaTeX formatting.
+  \item Google Gemini (Google, 2026)~\cite{google_gemini} for explanations of the
+        medical and physiological vocabulary of the ECG, which lies outside my
+        field.
+\end{itemize}
+
+No tool was given confidential material. Every generated element, whether text,
+code or reference, was read, checked and adapted by the author, who takes full
+responsibility for the validity and the originality of the work. In particular, no
+number reported here comes from a model: all results were produced by running the
+code in the repository~\cite{ammar2026repo}, and any code drafted or corrected with
+assistance is covered by the test suite described in
+Section~\ref{subsec:teststrategy}.
+
+\printbibliography[heading=bibintoc,title={References}]
 
 
 
