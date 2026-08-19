@@ -29,10 +29,8 @@ jobs:
         if: hashFiles('docs/presentation.tex') != ''
         run: |
           cd docs
-          pdflatex -interaction=nonstopmode presentation.tex
-          biber presentation
-          pdflatex -interaction=nonstopmode presentation.tex
-          pdflatex -interaction=nonstopmode presentation.tex
+          pdflatex -interaction=nonstopmode -halt-on-error presentation.tex
+          pdflatex -interaction=nonstopmode -halt-on-error presentation.tex
 
       - name: Rename to the deposit names
         run: |
